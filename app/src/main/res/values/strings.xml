@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Eventity</string>
+    <string name="password_hint">password</string>
+    <string name="email_hint">email address</string>
+    <string name="login_logo_desc">Loging Page Logo</string>
+    <string name="login_button_login">Login</string>
+    <string name="create_account_button">Create Account</string>
+    <string name="action_logout_text">Logout</string>
+    <string name="reg_btn_text">Create Account</string>
+    <string name="reg_to_login_text">Already registered?</string>
+    <string name="reg_password_confirm_hint">confirm password</string>
+    <string name="reg_logo">Create account logo</string>
+    <string name="profile_name_hint">Your name</string>
+    <string name="setup_button_name">Save Profile</string>
+    <string name="action_profile_text">Profile Settings</string>
+    <string name="team_creation_text2">"Creating a team will make you the admin of this team. "</string>
+    <string name="team_creation_text">Enter your team name and access code below.</string>
+    <string name="team_name_text">Team Name...</string>
+    <string name="create_team_btn_txt">Create Team</string>
+    <string name="team_code_hint_text">Team Access Code</string>
+</resources>

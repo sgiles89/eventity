@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "566755363446",
+    "firebase_url": "https://eventity-48d4d.firebaseio.com",
+    "project_id": "eventity-48d4d",
+    "storage_bucket": "eventity-48d4d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566755363446:android:432e904a1ec22f9c",
+        "android_client_info": {
+          "package_name": "com.example.stepheng.eventity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "566755363446-t8h2b8lv7kk1qo21lqkuo0bpod6t17e8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.stepheng.eventity",
+            "certificate_hash": "4049d52b20a190dc9d9ed95dc421ea18ccfb8436"
+          }
+        },
+        {
+          "client_id": "566755363446-6u6vgtho0bdlipaent6ssnb91dmou6s0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsj7yGqdjZvMxaXsIKUIUdXxTtLJ611QQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566755363446-6u6vgtho0bdlipaent6ssnb91dmou6s0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
