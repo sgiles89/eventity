@@ -13,33 +13,29 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.w3c.dom.Text;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class TeamCreationActivity extends AppCompatActivity {
 
-    //initialising UI elements
+    //declaring UI element variables
     private EditText teamName;
     private Button teamBtn;
     private EditText accessCode;
     private ProgressBar teamCreateProgress;
 
-    //initialising Firebase
+    //declaring Firebase
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore mFStore;
 
     //adding TAG
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "TeamCreationActivity";
 
     private String user_id;
     private String display_name;
@@ -61,7 +57,7 @@ public class TeamCreationActivity extends AppCompatActivity {
         //assign UI elements
         teamName = findViewById(R.id.team_name);
         teamBtn = findViewById(R.id.team_create_btn);
-        accessCode = findViewById(R.id.team_access_code);
+        accessCode = findViewById(R.id.join_team_code);
         teamCreateProgress = findViewById(R.id.team_create_progress);
 
         user_id = firebaseAuth.getCurrentUser().getUid();

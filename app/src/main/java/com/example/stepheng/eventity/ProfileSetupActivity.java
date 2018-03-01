@@ -149,7 +149,6 @@ public class ProfileSetupActivity extends AppCompatActivity {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
                     if (ContextCompat.checkSelfPermission(ProfileSetupActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(ProfileSetupActivity.this, "Permission Denied", Toast.LENGTH_LONG).show();
                         ActivityCompat.requestPermissions(ProfileSetupActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                     } else {
                         CropImage.activity()

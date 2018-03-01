@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToProfile() {
-        Intent profileIntent = new Intent(MainActivity.this, TeamCreationActivity.class);
+        Intent profileIntent = new Intent(MainActivity.this, JoinTeamActivity.class);
         startActivity(profileIntent);
         finish();
     }
