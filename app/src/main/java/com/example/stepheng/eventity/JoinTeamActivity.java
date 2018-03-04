@@ -1,5 +1,6 @@
 package com.example.stepheng.eventity;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 public class JoinTeamActivity extends AppCompatActivity {
 
-    //declaring
+    //declaring UI element variables
     private EditText teamName;
     private EditText teamCode;
     private Button joinBtn;
@@ -42,6 +43,7 @@ public class JoinTeamActivity extends AppCompatActivity {
 
     private String user_id;
     private String display_name;
+    private String teamId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,8 @@ public class JoinTeamActivity extends AppCompatActivity {
         joinBtn = findViewById(R.id.join_team_btn);
         teamCode = findViewById(R.id.join_team_code);
         joinProgress = findViewById(R.id.join_team_progress);
+
+
 
         user_id = firebaseAuth.getCurrentUser().getUid();
 
@@ -101,7 +105,7 @@ public class JoinTeamActivity extends AppCompatActivity {
                             for(DocumentSnapshot document : task.getResult()){
                                 teamResults.add(document.getId());
                             }
-                            String teamId = teamResults.get(0).toString();
+                            teamId = teamResults.get(0).toString();
 
                             DocumentReference joinWaitlist = mFStore.collection("Teams/"+teamId+"/Waitlist").document(user_id);
                             //create Member data hashmap
@@ -109,14 +113,17 @@ public class JoinTeamActivity extends AppCompatActivity {
                             waitlistData.put("name", display_name);
                             waitlistData.put("role", "user");
                             waitlistData.put("userID", user_id);
-                            //add user as the owner
+                            //put user in the waitlist
                             joinWaitlist.set(waitlistData);
-
                             //updating user profile with pending membership for new team
                             DocumentReference updateMemberships = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
                             Map<String, Object> membershipData = new HashMap<>();
                             membershipData.put("teamID", teamId);
                             membershipData.put("role", "pending");
+
+                            //show success message and send to Main Activity
+                            Toast.makeText(JoinTeamActivity.this, "Team Request sent", Toast.LENGTH_LONG).show();
+                            sendtoMain();
 
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -124,9 +131,16 @@ public class JoinTeamActivity extends AppCompatActivity {
                         }
                     }
                 });
+
             }
         });
 
 
+    }
+
+    private void sendtoMain() {
+        Intent mainIntent = new Intent(JoinTeamActivity.this, MainActivity.class);
+        startActivity(mainIntent);
+        finish();
     }
 }
