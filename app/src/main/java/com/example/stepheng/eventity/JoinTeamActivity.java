@@ -106,13 +106,17 @@ public class JoinTeamActivity extends AppCompatActivity {
                             DocumentReference joinWaitlist = mFStore.collection("Teams/"+teamId+"/Waitlist").document(user_id);
                             //create Member data hashmap
                             Map<String, Object> waitlistData = new HashMap<>();
-                            Map<String, Object> waitlistObject = new HashMap<>();
-                            waitlistObject.put("name", display_name);
-                            waitlistObject.put("role", "user");
-                            waitlistObject.put("userID", user_id);
-                            waitlistData.put(user_id, waitlistObject);
+                            waitlistData.put("name", display_name);
+                            waitlistData.put("role", "user");
+                            waitlistData.put("userID", user_id);
                             //add user as the owner
                             joinWaitlist.set(waitlistData);
+
+                            //updating user profile with pending membership for new team
+                            DocumentReference updateMemberships = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+                            Map<String, Object> membershipData = new HashMap<>();
+                            membershipData.put("teamID", teamId);
+                            membershipData.put("role", "pending");
 
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

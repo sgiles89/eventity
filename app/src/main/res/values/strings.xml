@@ -19,6 +19,7 @@
     <string name="create_team_btn_txt">Create Team</string>
     <string name="team_code_hint_text">Team Access Code</string>
     <string name="join_team_text">Enter your team name and access code below.</string>
-    <string name="join_team_text2" >Team name and Access code must be correct. If you are unsure, please contact your Team Admin</string>
+    <string name="join_team_text2">Team name and Access code must be correct. If you are unsure, please contact your Team Admin</string>
     <string name="join_team_btn_txt">Send Team Request</string>
+    <string name="action_admin_text">Admin Panel</string>
 </resources>

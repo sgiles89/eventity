@@ -59,14 +59,23 @@ public class MainActivity extends AppCompatActivity {
                 sendToProfile();
                 return true;
 
+            case R.id.action_admin_panel:
+                sendtoAdminMain();
+                return true;
 
             default:
                 return false;
         }
     }
 
+    private void sendtoAdminMain() {
+        Intent mainAdminItent = new Intent(MainActivity.this, AdminMainActivity.class);
+        startActivity(mainAdminItent);
+        finish();
+    }
+
     private void sendToProfile() {
-        Intent profileIntent = new Intent(MainActivity.this, JoinTeamActivity.class);
+        Intent profileIntent = new Intent(MainActivity.this, ProfileSetupActivity.class);
         startActivity(profileIntent);
         finish();
     }

@@ -6,6 +6,9 @@
         android:id="@+id/action_profile_button"
         android:title="@string/action_profile_text" />
     <item
+        android:id="@+id/action_admin_panel"
+        android:title="@string/action_admin_text" />
+    <item
         android:id="@+id/action_logout_btn"
         android:title="@string/action_logout_text" />
 </menu>
