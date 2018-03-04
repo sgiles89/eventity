@@ -120,6 +120,7 @@ public class JoinTeamActivity extends AppCompatActivity {
                             Map<String, Object> membershipData = new HashMap<>();
                             membershipData.put("teamID", teamId);
                             membershipData.put("role", "pending");
+                            updateMemberships.set(membershipData);
 
                             //show success message and send to Main Activity
                             Toast.makeText(JoinTeamActivity.this, "Team Request sent", Toast.LENGTH_LONG).show();

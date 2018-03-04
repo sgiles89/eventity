@@ -22,4 +22,5 @@
     <string name="join_team_text2">Team name and Access code must be correct. If you are unsure, please contact your Team Admin</string>
     <string name="join_team_btn_txt">Send Team Request</string>
     <string name="action_admin_text">Admin Panel</string>
+    <string name="action_join_team_txt">Join Team</string>
 </resources>

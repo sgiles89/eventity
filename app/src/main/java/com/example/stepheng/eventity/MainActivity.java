@@ -63,9 +63,19 @@ public class MainActivity extends AppCompatActivity {
                 sendtoAdminMain();
                 return true;
 
+            case R.id.action_join_team:
+                sentToJoinTeam();
+                return true;
+
             default:
                 return false;
         }
+    }
+
+    private void sentToJoinTeam() {
+        Intent JoinTeamItent = new Intent(MainActivity.this, JoinTeamActivity.class);
+        startActivity(JoinTeamItent);
+        finish();
     }
 
     private void sendtoAdminMain() {

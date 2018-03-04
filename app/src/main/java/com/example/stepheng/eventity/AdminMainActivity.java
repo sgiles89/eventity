@@ -1,6 +1,7 @@
 package com.example.stepheng.eventity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,9 +16,16 @@ import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,7 +72,39 @@ public class AdminMainActivity extends AppCompatActivity {
                 holder.accept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(AdminMainActivity.this, model.getName()+" was added to the team", Toast.LENGTH_LONG).show();
+
+                        //Setup a Write Batch to add the new user to Members, delete them from Waitlist and update their user profile to show membership
+                        WriteBatch batch = db.batch();
+                        DocumentReference memberList = db.collection("Teams/YfLa27NWaaQSfNwhZPgX/Members").document(model.getUserID());
+                        Map<String, Object> newMember = new HashMap<>();
+                        newMember.put("name", model.getName());
+                        newMember.put("role", "user");
+                        newMember.put("userID",model.getUserID());
+                        batch.set(memberList, newMember);
+                        DocumentReference waitListRef = db.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist").document(model.getUserID());
+                        batch.delete(waitListRef);
+                        DocumentReference userProfileRef = db.collection("Users/"+model.getUserID()+"/Membership").document("Membership");
+                        batch.update(userProfileRef,"role", "user");
+
+                        // Commit the batch
+                        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Toast.makeText(AdminMainActivity.this, model.getName()+" was added to the team", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(AdminMainActivity.this, "failure"+task.getException(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
+
+                    }
+                });
+                holder.reject.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(AdminMainActivity.this, model.getName()+" was rejected", Toast.LENGTH_LONG).show();
                     }
                 });
             }
