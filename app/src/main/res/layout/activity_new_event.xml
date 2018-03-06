@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.stepheng.eventity.JoinTeamActivity">
+    tools:context="com.example.stepheng.eventity.NewEventActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/join_team_toolbar"
+        android:id="@+id/new_event_toolbar"
         android:layout_width="match_parent"
         android:layout_height="57dp"
         android:background="@color/colorPrimary"
@@ -17,84 +17,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/join_team_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/join_team_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_progress" />
-
-    <TextView
-        android:id="@+id/join_team_text2"
+    <EditText
+        android:id="@+id/event_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/join_team_text2"
+        android:ems="10"
+        android:hint="@string/event_title_txt"
+        app:layout_constraintBottom_toTopOf="@+id/event_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_text" />
+        app:layout_constraintTop_toBottomOf="@+id/new_event_toolbar" />
 
-    <EditText
-        android:id="@+id/join_team_name"
-        android:layout_width="368dp"
+    <TextView
+        android:id="@+id/event_date"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
         android:ems="10"
-        android:hint="@string/team_name_text"
-        android:inputType="textPersonName"
+        android:hint="@string/event_date_txt"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/event_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_title" />
+
+    <EditText
+        android:id="@+id/event_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="@string/event_time_txt"
+        android:inputType="time"
+        app:layout_constraintBottom_toTopOf="@+id/event_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_date" />
+
+    <EditText
+        android:id="@+id/event_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="@string/event_desc_text"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toTopOf="@+id/create_event_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_location" />
+
+    <EditText
+        android:id="@+id/event_location"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="@string/event_location_text"
+        android:inputType="textPostalAddress"
+        app:layout_constraintBottom_toTopOf="@+id/event_desc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_time" />
+
+    <Button
+        android:id="@+id/create_event_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="@string/create_event_btn_txt"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_text2" />
-
-    <Button
-        android:id="@+id/join_team_btn"
-        android:layout_width="368dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/colorAccent"
-        android:text="@string/join_team_btn_txt"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_code" />
-
-    <EditText
-        android:id="@+id/join_team_code"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="@string/team_code_hint_text"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_name" />
-
-    <ProgressBar
-        android:id="@+id/join_team_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:progressTint="@color/colorAccent"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_team_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/event_desc" />
 
 </android.support.constraint.ConstraintLayout>

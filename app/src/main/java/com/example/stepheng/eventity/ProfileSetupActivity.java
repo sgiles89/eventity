@@ -1,6 +1,5 @@
 package com.example.stepheng.eventity;
 
-import android.*;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -53,7 +51,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
 
     //initialising Firebase
     private StorageReference storageReference;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
 
 
@@ -66,11 +64,11 @@ public class ProfileSetupActivity extends AppCompatActivity {
         setSupportActionBar(profileSetupToolbar);
         getSupportActionBar().setTitle("Profile Setup");
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
 
         mFStore = FirebaseFirestore.getInstance();
-        user_id = firebaseAuth.getInstance().getUid();
+        user_id = mAuth.getInstance().getUid();
 
         setupImage = findViewById(R.id.profile_setup_image);
         setupName = findViewById(R.id.setup_name);
@@ -118,7 +116,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
 
                     if (isChanged) {
 
-                        user_id = firebaseAuth.getCurrentUser().getUid();
+                        user_id = mAuth.getCurrentUser().getUid();
 
                         StorageReference image_path = storageReference.child("profile_images").child(user_id + ".jpg");
                         image_path.putFile(profileImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {

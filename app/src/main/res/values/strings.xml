@@ -23,4 +23,10 @@
     <string name="join_team_btn_txt">Send Team Request</string>
     <string name="action_admin_text">Admin Panel</string>
     <string name="action_join_team_txt">Join Team</string>
+    <string name="event_title_txt">Add Event Title</string>
+    <string name="event_date_txt">Add Event Date</string>
+    <string name="event_time_txt">Add Event Time</string>
+    <string name="event_location_text">Add Event Location</string>
+    <string name="event_desc_text" >Add Event Description</string>
+    <string name="create_event_btn_txt">Create Event</string>
 </resources>

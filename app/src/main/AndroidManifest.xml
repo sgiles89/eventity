@@ -32,7 +32,8 @@
             android:theme="@style/Base.Theme.AppCompat" /> <!-- optional (needed if default theme has no action bar) -->
         <activity android:name=".TeamCreationActivity" />
         <activity android:name=".JoinTeamActivity" />
-        <activity android:name=".AdminMainActivity"></activity>
+        <activity android:name=".AdminMainActivity" />
+        <activity android:name=".NewEventActivity"></activity>
     </application>
 
 </manifest>

@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToProfile() {
-        Intent profileIntent = new Intent(MainActivity.this, ProfileSetupActivity.class);
+        Intent profileIntent = new Intent(MainActivity.this, NewEventActivity.class);
         startActivity(profileIntent);
         finish();
     }
