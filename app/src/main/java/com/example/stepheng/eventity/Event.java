@@ -58,6 +58,14 @@ public class Event {
         }
         return eventMonth;
     }
+
+    public String getDay(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.date);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String dayString = String.valueOf(day);
+        return dayString;
+    }
     public String getTitle() {
         return title;
     }

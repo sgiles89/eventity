@@ -17,10 +17,15 @@ android {
         }
     }
 }
+ext {
+    supportLibVersion = '27.1.0'  // variable that can be referenced to keep support libs consistent
+}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.0'
+    compile "com.android.support:design:${supportLibVersion}"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.firebase:firebase-auth:11.8.0'
     implementation 'com.google.firebase:firebase-storage:11.8.0'
@@ -37,14 +42,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:recyclerview-v7:27.1.0'
 }
-
-
-
-
-
-
-
-
-
-
 apply plugin: 'com.google.gms.google-services'

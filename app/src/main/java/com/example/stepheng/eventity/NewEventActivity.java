@@ -2,6 +2,7 @@ package com.example.stepheng.eventity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ParseException;
@@ -17,6 +18,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +40,7 @@ import butterknife.ButterKnife;
 
 public class NewEventActivity extends AppCompatActivity {
     //declaring and assigning UI elements
+    @BindView(R.id.new_event_toolbar) android.support.v7.widget.Toolbar newEventToolbar;
     @BindView(R.id.event_title) EditText eventName;
     @BindView(R.id.event_desc) EditText eventDesc;
     @BindView(R.id.event_date) TextView eventDate;
@@ -55,6 +58,7 @@ public class NewEventActivity extends AppCompatActivity {
     private Calendar calendar;
 
     private String user_id;
+    private String team_id;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
@@ -67,7 +71,7 @@ public class NewEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_event);
 
         //set Toolbar
-        android.support.v7.widget.Toolbar newEventToolbar = findViewById(R.id.new_event_toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(newEventToolbar);
         getSupportActionBar().setTitle("New Event");
 
@@ -77,7 +81,6 @@ public class NewEventActivity extends AppCompatActivity {
 
 
         //retrieving user's Firebase ID and their Team ID
-        final String[] team_id = new String[1];
         user_id = mAuth.getCurrentUser().getUid();
         DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
         teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
@@ -86,7 +89,7 @@ public class NewEventActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
-                       team_id[0] = document.get("teamID").toString();
+                        setTeamID(document.get("teamID").toString());
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -95,9 +98,6 @@ public class NewEventActivity extends AppCompatActivity {
                 }
             }
         });
-
-        //binding the UI elements
-        ButterKnife.bind(this);
 
         //adding a DatePicker for date field
         eventDate.setOnClickListener(new View.OnClickListener() {
@@ -139,21 +139,35 @@ public class NewEventActivity extends AppCompatActivity {
         eventCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //get data from all the fields
                 final String event_title = eventName.getText().toString();
                 final String event_description = eventDesc.getText().toString();
                 final String event_location = eventLocation.getText().toString();
                 final String event_date = eventDate.getText().toString();
                 final String event_time = eventTime.getText().toString();
                 final Date event_time_and_date = getDateFromString(event_date+"T"+event_time+"Z");
-                Log.d(TAG, event_time_and_date.toString());
-                DocumentReference newEvent = mFStore.collection("Teams/"+ team_id[0] +"/Events").document();
+
+                //store event in Firestore
+                DocumentReference newEvent = mFStore.collection("Teams/"+ team_id +"/Events").document();
                 newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description));
+
+                //add a success toast and send to Main Activity
+                Toast.makeText(NewEventActivity.this, "Event created", Toast.LENGTH_LONG);
+                sendToMain();
 
             }
         });
 
 
     }
+
+    private void sendToMain() {
+        Intent mainIntent = new Intent(NewEventActivity.this, MainActivity.class);
+        startActivity(mainIntent);
+        finish();
+    }
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-M-d'T'HH:mm'Z'");
     public Date getDateFromString(String datetoSaved){
 
@@ -167,5 +181,8 @@ public class NewEventActivity extends AppCompatActivity {
             return null;
         }
 
+    }
+    public void setTeamID(String teamid){
+        this.team_id = teamid;
     }
 }

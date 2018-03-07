@@ -1,31 +1,44 @@
 package com.example.stepheng.eventity;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
     private android.support.v7.widget.Toolbar mainToolbar;
     private FirebaseAuth mAuth;
+    @BindView(R.id.add_event_btn) private FloatingActionButton nFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
 
         mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setTitle("Eventity");
-
+        nFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newPost = new Intent(MainActivity.this, NewEventActivity.class);
+                startActivity(newPost);
+                finish();
+            }
+        });
     }
     @Override
     protected void onStart() {
