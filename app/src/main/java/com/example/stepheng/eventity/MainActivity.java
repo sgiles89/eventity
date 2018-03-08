@@ -1,7 +1,12 @@
 package com.example.stepheng.eventity;
 
+
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,13 +24,26 @@ public class MainActivity extends AppCompatActivity {
 
     private android.support.v7.widget.Toolbar mainToolbar;
     private FirebaseAuth mAuth;
-    @BindView(R.id.add_event_btn) private FloatingActionButton nFAB;
+    @BindView(R.id.add_event_btn) FloatingActionButton nFAB;
+    @BindView(R.id.mainBottomNav) BottomNavigationView mainBottomNav;
+    private FragmentHome homeFragment;
+    private FragmentEvents eventsFragment;
+    private FragmentNotifications notificationsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+
+        //Setting up fragments
+        homeFragment = new FragmentHome();
+        notificationsFragment = new FragmentNotifications();
+        eventsFragment = new FragmentEvents();
+        //setting Home as default fragment
+        switchFragment(homeFragment);
+
         mAuth = FirebaseAuth.getInstance();
 
         mainToolbar = findViewById(R.id.main_toolbar);
@@ -37,6 +55,38 @@ public class MainActivity extends AppCompatActivity {
                 Intent newPost = new Intent(MainActivity.this, NewEventActivity.class);
                 startActivity(newPost);
                 finish();
+            }
+        });
+
+
+
+        //defaulting view to Home fragment
+
+
+
+        mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()){
+
+                    case R.id.bottom_action_home :
+                        switchFragment(homeFragment);
+                        return true;
+
+                    case R.id.bottom_action_events :
+                        switchFragment(eventsFragment);
+                        return true;
+
+                    case R.id.bottom_action_notifications :
+                        switchFragment(notificationsFragment);
+                        return true;
+
+                    default:
+                        return false;
+                }
+
+
             }
         });
     }
@@ -98,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToProfile() {
-        Intent profileIntent = new Intent(MainActivity.this, NewEventActivity.class);
+        Intent profileIntent = new Intent(MainActivity.this, ProfileSetupActivity.class);
         startActivity(profileIntent);
         finish();
     }
@@ -114,5 +164,11 @@ public class MainActivity extends AppCompatActivity {
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(loginIntent);
         finish();
+    }
+
+    private void switchFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_container, fragment);
+        fragmentTransaction.commit();
     }
 }

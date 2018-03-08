@@ -27,6 +27,15 @@
     <string name="event_date_txt">Add Event Date</string>
     <string name="event_time_txt">Add Event Time</string>
     <string name="event_location_text">Add Event Location</string>
-    <string name="event_desc_text" >Add Event Description</string>
+    <string name="event_desc_text">Add Event Description</string>
     <string name="create_event_btn_txt">Create Event</string>
+    <string name="bottom_home_text">Home</string>
+    <string name="bottom_events_text">Events</string>
+    <string name="bottom_notifications_text">Notifications</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="upcoming_event_txt">Upcoming Events</string>
+    <string name="past_event_text">Past Events</string>
+    <string name="static_hyphen_text">-</string>
 </resources>

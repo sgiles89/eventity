@@ -147,10 +147,10 @@ public class NewEventActivity extends AppCompatActivity {
                 final String event_date = eventDate.getText().toString();
                 final String event_time = eventTime.getText().toString();
                 final Date event_time_and_date = getDateFromString(event_date+"T"+event_time+"Z");
-
+                Log.d(TAG, "The event time was: "+event_time);
                 //store event in Firestore
                 DocumentReference newEvent = mFStore.collection("Teams/"+ team_id +"/Events").document();
-                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description));
+                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time));
 
                 //add a success toast and send to Main Activity
                 Toast.makeText(NewEventActivity.this, "Event created", Toast.LENGTH_LONG);

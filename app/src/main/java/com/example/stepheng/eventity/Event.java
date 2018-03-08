@@ -13,16 +13,21 @@ public class Event {
     private String creatorID;
     private String location;
     private String description;
+    private String time;
+
 
     public Event(){}
 
-    public Event(String title, Date date, String creatorID, String location, String description) {
+    public Event(String title, Date date, String creatorID, String location, String description, String time) {
         this.title = title;
         this.date = date;
         this.creatorID = creatorID;
         this.location = location;
         this.description = description;
+        this.time = time;
     }
+
+
     public String getMonth(){
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.date);
@@ -104,5 +109,12 @@ public class Event {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTime() {
+        return time;}
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

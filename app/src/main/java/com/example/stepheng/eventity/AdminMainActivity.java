@@ -35,9 +35,9 @@ public class AdminMainActivity extends AppCompatActivity {
     ProgressBar progressBar;
 
     @BindView(R.id.waitlist)
-    RecyclerView friendList;
+    RecyclerView waitlist;
 
-    private FirebaseFirestore db;
+    private FirebaseFirestore mFStore;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
 
@@ -47,17 +47,17 @@ public class AdminMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_main);
         ButterKnife.bind(this);
         init();
-        getFriendList();
+        getWaitList();
     }
 
     private void init(){
         linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-        friendList.setLayoutManager(linearLayoutManager);
-        db = FirebaseFirestore.getInstance();
+        waitlist.setLayoutManager(linearLayoutManager);
+        mFStore = FirebaseFirestore.getInstance();
     }
 
-    private void getFriendList(){
-        Query query = db.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist");
+    private void getWaitList(){
+        Query query = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist");
 
         FirestoreRecyclerOptions<WaitlistMember> response = new FirestoreRecyclerOptions.Builder<WaitlistMember>()
                 .setQuery(query, WaitlistMember.class)
@@ -74,16 +74,16 @@ public class AdminMainActivity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         //Setup a Write Batch to add the new user to Members, delete them from Waitlist and update their user profile to show membership
-                        WriteBatch batch = db.batch();
-                        DocumentReference memberList = db.collection("Teams/YfLa27NWaaQSfNwhZPgX/Members").document(model.getUserID());
+                        WriteBatch batch = mFStore.batch();
+                        DocumentReference memberList = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Members").document(model.getUserID());
                         Map<String, Object> newMember = new HashMap<>();
                         newMember.put("name", model.getName());
                         newMember.put("role", "user");
                         newMember.put("userID",model.getUserID());
                         batch.set(memberList, newMember);
-                        DocumentReference waitListRef = db.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist").document(model.getUserID());
+                        DocumentReference waitListRef = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist").document(model.getUserID());
                         batch.delete(waitListRef);
-                        DocumentReference userProfileRef = db.collection("Users/"+model.getUserID()+"/Membership").document("Membership");
+                        DocumentReference userProfileRef = mFStore.collection("Users/"+model.getUserID()+"/Membership").document("Membership");
                         batch.update(userProfileRef,"role", "user");
 
                         // Commit the batch
@@ -126,7 +126,7 @@ public class AdminMainActivity extends AppCompatActivity {
         };
 
         adapter.notifyDataSetChanged();
-        friendList.setAdapter(adapter);
+        waitlist.setAdapter(adapter);
     }
 
     public class WaitlistMemberHolder extends RecyclerView.ViewHolder {
