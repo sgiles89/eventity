@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent newPost = new Intent(MainActivity.this, NewEventActivity.class);
                 startActivity(newPost);
-                finish();
             }
         });
 
@@ -130,9 +129,19 @@ public class MainActivity extends AppCompatActivity {
                 sentToJoinTeam();
                 return true;
 
+            case R.id.action_create_team:
+                sendtoCreateTeam();
+                return true;
+
             default:
                 return false;
         }
+    }
+
+    private void sendtoCreateTeam() {
+        Intent createTeamIntent = new Intent(MainActivity.this, TeamCreationActivity.class);
+        startActivity(createTeamIntent);
+        finish();
     }
 
     private void sentToJoinTeam() {

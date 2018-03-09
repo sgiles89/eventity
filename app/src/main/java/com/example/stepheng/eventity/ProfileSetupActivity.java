@@ -60,7 +60,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setup);
 
-        android.support.v7.widget.Toolbar profileSetupToolbar = findViewById(R.id.setup_toolbar);
+        android.support.v7.widget.Toolbar profileSetupToolbar = findViewById(R.id.support_toolbar);
         setSupportActionBar(profileSetupToolbar);
         getSupportActionBar().setTitle("Profile Setup");
 
