@@ -14,17 +14,19 @@ public class Event {
     private String location;
     private String description;
     private String time;
+    private String eventID;
 
 
     public Event(){}
 
-    public Event(String title, Date date, String creatorID, String location, String description, String time) {
+    public Event(String title, Date date, String creatorID, String location, String description, String time, String eventID) {
         this.title = title;
         this.date = date;
         this.creatorID = creatorID;
         this.location = location;
         this.description = description;
         this.time = time;
+        this.eventID = eventID;
     }
 
 
@@ -117,4 +119,13 @@ public class Event {
     public void setTime(String time) {
         this.time = time;
     }
+
+    public String getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
 }
+

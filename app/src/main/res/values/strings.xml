@@ -39,4 +39,5 @@
     <string name="past_event_text">Past Events</string>
     <string name="static_hyphen_text">-</string>
     <string name="action_create_team_text">Create Team</string>
+    <string name="events_upcoming_text">Events</string>
 </resources>

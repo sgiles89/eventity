@@ -1,6 +1,7 @@
 package com.example.stepheng.eventity;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -32,25 +33,27 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class FragmentHome extends Fragment {
 
     private String team_id;
-    private String user_id;
     private String TAG = "FragmentHome";
+    private String user_id;
     private Date currentDate = Calendar.getInstance().getTime();
 
     @BindView(R.id.upcoming_view)
     RecyclerView upcomingView;
+    @BindView(R.id.past_view)
+    RecyclerView pastView;
 
     //declare Firebase variables
     private FirebaseFirestore mFStore;
     private FirebaseAuth mAuth;
-    private FirestoreRecyclerAdapter adapter;
-    LinearLayoutManager linearLayoutManager;
+
+    //declare RecyclerView and Butterknife variables
+    private FirestoreRecyclerAdapter upAdapter;
+    private FirestoreRecyclerAdapter pastAdapter;
+    LinearLayoutManager upcomingLLM;
+    LinearLayoutManager pastLLM;
     private Unbinder unbinder;
 
     public FragmentHome() {
@@ -69,7 +72,16 @@ public class FragmentHome extends Fragment {
         mFStore = FirebaseFirestore.getInstance();
 
         //retrieving user's Firebase ID and their Team ID
-        user_id = mAuth.getCurrentUser().getUid();
+
+        if (mAuth.getCurrentUser() == null) {
+            Intent newIntent = new Intent(getContext(), LoginActivity.class);
+            startActivity(newIntent);
+        }
+        else{
+            user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+
+        //retrieving Team ID
         DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
         teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
             @Override
@@ -79,7 +91,7 @@ public class FragmentHome extends Fragment {
                     if (document != null && document.exists()) {
                         setTeamID(document.get("teamID").toString());
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.d(TAG, "profile has no team");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
@@ -88,26 +100,28 @@ public class FragmentHome extends Fragment {
         });
         init();
         getUpcoming();
+        getPast();
         return view;
     }
 
     private void init(){
-        linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        upcomingView.setLayoutManager(linearLayoutManager);
-        mFStore = FirebaseFirestore.getInstance();
+        upcomingLLM = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        pastLLM = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        upcomingView.setLayoutManager(upcomingLLM);
+        pastView.setLayoutManager(pastLLM);
     }
 
     private void getUpcoming(){
-        Query query = mFStore.collection("Teams/"+team_id+"/Events")
+        Query upQuery = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Events")
                 .whereGreaterThan("date", currentDate)
                 .orderBy("date", Query.Direction.ASCENDING)
                 .limit(3);
 
         FirestoreRecyclerOptions<Event> response = new FirestoreRecyclerOptions.Builder<Event>()
-                .setQuery(query, Event.class)
+                .setQuery(upQuery, Event.class)
                 .build();
 
-        adapter = new FirestoreRecyclerAdapter<Event, EventHolder>(response) {
+        upAdapter = new FirestoreRecyclerAdapter<Event, EventHolder>(response) {
             @Override
             public void onBindViewHolder(EventHolder holder, int position, final Event model) {
                 holder.eventTitle.setText(model.getTitle());
@@ -133,9 +147,51 @@ public class FragmentHome extends Fragment {
             }
         };
 
-        adapter.notifyDataSetChanged();
-        upcomingView.setAdapter(adapter);
+        upAdapter.notifyDataSetChanged();
+        upcomingView.setAdapter(upAdapter);
     }
+
+    private void getPast(){
+        Query pastQuery = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Events")
+                .whereLessThan("date", currentDate)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(3);
+
+        FirestoreRecyclerOptions<Event> response = new FirestoreRecyclerOptions.Builder<Event>()
+                .setQuery(pastQuery, Event.class)
+                .build();
+
+        pastAdapter = new FirestoreRecyclerAdapter<Event, EventHolder>(response) {
+            @Override
+            public void onBindViewHolder(EventHolder holder, int position, final Event model) {
+                holder.eventTitle.setText(model.getTitle());
+                holder.dayText.setText(model.getDay());
+                holder.monthText.setText(model.getMonth());
+                holder.timeText.setText(model.getTime());
+                holder.locationText.setText(model.getLocation());
+            }
+
+
+
+            @Override
+            public EventHolder onCreateViewHolder(ViewGroup group, int i) {
+                View view = LayoutInflater.from(group.getContext())
+                        .inflate(R.layout.eventlist_layout, group, false);
+
+                return new EventHolder(view);
+            }
+
+            @Override
+            public void onError(FirebaseFirestoreException e) {
+                Log.e("error", e.getMessage());
+            }
+        };
+
+        pastAdapter.notifyDataSetChanged();
+        pastView.setAdapter(pastAdapter);
+    }
+
+
 
     public class EventHolder extends RecyclerView.ViewHolder {
 
@@ -156,13 +212,15 @@ public class FragmentHome extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
+        upAdapter.startListening();
+        pastAdapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
+        upAdapter.stopListening();
+        pastAdapter.stopListening();
     }
 
     @Override public void onDestroyView() {
