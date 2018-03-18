@@ -18,7 +18,9 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -38,8 +40,13 @@ public class AdminMainActivity extends AppCompatActivity {
     RecyclerView waitlist;
 
     private FirebaseFirestore mFStore;
+    private FirebaseAuth mAuth;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
+
+    private String user_id;
+    private String team_id;
+    private String TAG = "AdminMainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +54,36 @@ public class AdminMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_main);
         ButterKnife.bind(this);
         init();
-        getWaitList();
+        DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()){
+                        String teamID = document.getString("teamID");
+                        getWaitList(teamID);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
     }
 
     private void init(){
         linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         waitlist.setLayoutManager(linearLayoutManager);
         mFStore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user_id = mAuth.getCurrentUser().getUid();
     }
 
-    private void getWaitList(){
-        Query query = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist");
+    private void getWaitList(final String team_id){
+        Query query = mFStore.collection("Teams/"+team_id +"/Waitlist");
 
         FirestoreRecyclerOptions<WaitlistMember> response = new FirestoreRecyclerOptions.Builder<WaitlistMember>()
                 .setQuery(query, WaitlistMember.class)
@@ -75,13 +101,13 @@ public class AdminMainActivity extends AppCompatActivity {
 
                         //Setup a Write Batch to add the new user to Members, delete them from Waitlist and update their user profile to show membership
                         WriteBatch batch = mFStore.batch();
-                        DocumentReference memberList = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Members").document(model.getUserID());
+                        DocumentReference memberList = mFStore.collection("Teams/"+team_id+"/Members").document(model.getUserID());
                         Map<String, Object> newMember = new HashMap<>();
                         newMember.put("name", model.getName());
                         newMember.put("role", "user");
                         newMember.put("userID",model.getUserID());
                         batch.set(memberList, newMember);
-                        DocumentReference waitListRef = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Waitlist").document(model.getUserID());
+                        DocumentReference waitListRef = mFStore.collection("Teams/"+team_id+"/Waitlist").document(model.getUserID());
                         batch.delete(waitListRef);
                         DocumentReference userProfileRef = mFStore.collection("Users/"+model.getUserID()+"/Membership").document("Membership");
                         batch.update(userProfileRef,"role", "user");
@@ -127,6 +153,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
         adapter.notifyDataSetChanged();
         waitlist.setAdapter(adapter);
+        adapter.startListening();
     }
 
     public class WaitlistMemberHolder extends RecyclerView.ViewHolder {
@@ -146,7 +173,6 @@ public class AdminMainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
     }
 
     @Override
@@ -154,5 +180,4 @@ public class AdminMainActivity extends AppCompatActivity {
         super.onStop();
         adapter.stopListening();
     }
-
 }

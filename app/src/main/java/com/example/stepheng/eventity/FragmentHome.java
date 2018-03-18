@@ -71,7 +71,7 @@ public class FragmentHome extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mFStore = FirebaseFirestore.getInstance();
 
-        //retrieving user's Firebase ID and their Team ID
+        //retrieving user's Firebase ID
 
         if (mAuth.getCurrentUser() == null) {
             Intent newIntent = new Intent(getContext(), LoginActivity.class);
@@ -80,27 +80,25 @@ public class FragmentHome extends Fragment {
         else{
             user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
-
-        //retrieving Team ID
+        init();
         DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-        teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+        teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        setTeamID(document.get("teamID").toString());
+                    if (document != null && document.exists()){
+                        String teamID = document.getString("teamID");
+                        getUpcoming(teamID);
+                        getPast(teamID);
                     } else {
-                        Log.d(TAG, "profile has no team");
+                        Log.d(TAG, "No such document");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });
-        init();
-        getUpcoming();
-        getPast();
         return view;
     }
 
@@ -109,10 +107,12 @@ public class FragmentHome extends Fragment {
         pastLLM = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         upcomingView.setLayoutManager(upcomingLLM);
         pastView.setLayoutManager(pastLLM);
+        mAuth = FirebaseAuth.getInstance();
+        user_id = mAuth.getCurrentUser().getUid();
     }
 
-    private void getUpcoming(){
-        Query upQuery = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Events")
+    private void getUpcoming(String team_id){
+        Query upQuery = mFStore.collection("Teams/"+team_id+"/Events")
                 .whereGreaterThan("date", currentDate)
                 .orderBy("date", Query.Direction.ASCENDING)
                 .limit(3);
@@ -129,6 +129,16 @@ public class FragmentHome extends Fragment {
                 holder.monthText.setText(model.getMonth());
                 holder.timeText.setText(model.getTime());
                 holder.locationText.setText(model.getLocation());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getActivity(), EventViewActivity.class);
+                        String eventID = model.getEventID();
+                        i.putExtra("event_id", eventID);
+                        Log.d(TAG, "I put "+eventID+" into the intent");
+                        startActivity(i);
+                    }
+                });
             }
 
 
@@ -149,10 +159,11 @@ public class FragmentHome extends Fragment {
 
         upAdapter.notifyDataSetChanged();
         upcomingView.setAdapter(upAdapter);
+        upAdapter.startListening();
     }
 
-    private void getPast(){
-        Query pastQuery = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Events")
+    private void getPast(String team_id){
+        Query pastQuery = mFStore.collection("Teams/"+team_id+"/Events")
                 .whereLessThan("date", currentDate)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(3);
@@ -189,6 +200,7 @@ public class FragmentHome extends Fragment {
 
         pastAdapter.notifyDataSetChanged();
         pastView.setAdapter(pastAdapter);
+        pastAdapter.startListening();
     }
 
 
@@ -212,8 +224,10 @@ public class FragmentHome extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        upAdapter.startListening();
-        pastAdapter.startListening();
+        if (upAdapter != null && pastAdapter != null){
+            pastAdapter.startListening();
+            upAdapter.startListening();
+        }
     }
 
     @Override
@@ -222,6 +236,14 @@ public class FragmentHome extends Fragment {
         upAdapter.stopListening();
         pastAdapter.stopListening();
     }
+    /*
+    @Override
+    public void onResume(){
+        super.onResume();
+        pastAdapter.startListening();
+        upAdapter.startListening();
+    }
+    */
 
     @Override public void onDestroyView() {
         super.onDestroyView();

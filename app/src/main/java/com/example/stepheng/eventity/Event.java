@@ -1,5 +1,6 @@
 package com.example.stepheng.eventity;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,6 +30,11 @@ public class Event {
         this.eventID = eventID;
     }
 
+    public String getNiceDate(){
+        SimpleDateFormat niceDate = new SimpleDateFormat("EEE MMM dd yyyy");
+        String newNiceDate = niceDate.format(this.date);
+        return newNiceDate;
+    }
 
     public String getMonth(){
         Calendar cal = Calendar.getInstance();

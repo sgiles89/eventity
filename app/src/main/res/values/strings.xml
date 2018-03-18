@@ -40,4 +40,21 @@
     <string name="static_hyphen_text">-</string>
     <string name="action_create_team_text">Create Team</string>
     <string name="events_upcoming_text">Events</string>
+    <string name="event_title_text">Event Title</string>
+    <string name="event_text_when">When</string>
+    <string name="event_text_where">Where</string>
+    <string name="event_text_description">Description</string>
+    <string name="event_num_zero">0</string>
+    <string name="event_date_text">Date</string>
+    <string name="event_time_text">Time</string>
+    <string name="event_text_at">at</string>
+    <string name="event_text_going">Going</string>
+    <string name="event_text_maybe">Maybe</string>
+    <string name="event_text_not">Not Going</string>
+    <string name="event_location_txt">Location</string>
+    <string name="no_team_text_1">It appears you\'re not a member of any team :(</string>
+    <string name="no_team_text">Choose an option below to create a new team or join an existing team.</string>
+    <string name="create_btn_text">Create A Team</string>
+    <string name="join_team_btn">Join A Team</string>
+    <string name="pending_team_text">You have a pending membership request and must wait until the team admin adds you.</string>
 </resources>

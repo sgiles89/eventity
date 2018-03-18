@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,8 +104,8 @@ public class TeamCreationActivity extends AppCompatActivity {
 
     private void createTeam(String teamName, String access_code, final String user_id) {
         //create the Team document
-        final DocumentReference newTeam = mFStore.collection("Teams").document();
-
+        DocumentReference newTeam = mFStore.collection("Teams").document();
+        final String teamID = newTeam.getId();
         //create Team data hashmap
         Map<String, Object> teamData = new HashMap<>();
         teamData.put("name", teamName);
@@ -118,30 +119,29 @@ public class TeamCreationActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             //continue with creating team
-                            String teamID = newTeam.getId();
-
-                            DocumentReference newMembers = mFStore.collection("Teams/"+teamID+"/Members").document();
+                            WriteBatch batch = mFStore.batch();
+                            DocumentReference newMembers = mFStore.collection("Teams/"+teamID+"/Members").document(user_id);
                             //create Member data hashmap
                             Map<String, Object> memberData = new HashMap<>();
-                            Map<String, Object> memberObject = new HashMap<>();
-                            memberObject.put("name", display_name);
-                            memberObject.put("userID", user_id);
-                            memberObject.put("role", "owner");
-                            memberData.put(user_id, memberObject);
+                            memberData.put("name", display_name);
+                            memberData.put("userID", user_id);
+                            memberData.put("role", "owner");
                             //add user as the owner
-                            newMembers.set(memberData);
-                            //create team waitlist
-                            DocumentReference newWaitlist = mFStore.collection("Teams/"+teamID+"/Waitlist").document();
-                            Map<String, Object> waitlistData = new HashMap<>();
-                            Map<String, Object> waitlistObject = new HashMap<>();
-                            waitlistObject.put("name", "Example User");
-                            waitlistObject.put("userID", "User ID");
-                            waitlistObject.put("role", "user");
-                            waitlistData.put("userID", waitlistObject);
-                            newWaitlist.set(waitlistData);
-
-                            //send the user to login
-                            sendToLogin();
+                            batch.set(newMembers, memberData);
+                            DocumentReference userProfile = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+                            Map<String, Object> userData = new HashMap<>();
+                            userData.put("role", "owner");
+                            userData.put("userID", user_id);
+                            userData.put("teamID", teamID);
+                            batch.set(userProfile,userData);
+                            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    //send the user to login
+                                    Toast.makeText(TeamCreationActivity.this, "Team Created", Toast.LENGTH_LONG).show();
+                                    sendToLogin();
+                                }
+                            });
                         } else {
                             //display an error to try again later
                             Toast.makeText(TeamCreationActivity.this, "Error creating team. Please try again later", Toast.LENGTH_LONG).show();

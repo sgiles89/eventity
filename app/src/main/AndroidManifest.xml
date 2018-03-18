@@ -33,7 +33,8 @@
         <activity android:name=".TeamCreationActivity" />
         <activity android:name=".JoinTeamActivity" />
         <activity android:name=".AdminMainActivity" />
-        <activity android:name=".NewEventActivity"></activity>
+        <activity android:name=".NewEventActivity" />
+        <activity android:name=".EventViewActivity"></activity>
     </application>
 
 </manifest>

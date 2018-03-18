@@ -37,7 +37,6 @@ import butterknife.Unbinder;
  */
 public class FragmentEvents extends Fragment {
 
-    private String team_id;
     private String TAG = "FragmentEvents";
     private String user_id;
     private Date currentDate = Calendar.getInstance().getTime();
@@ -78,36 +77,36 @@ public class FragmentEvents extends Fragment {
         else{
             user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
-
-        //retrieving Team ID
+        init();
         DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-        teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+        teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        setTeamID(document.get("teamID").toString());
+                    if (document != null && document.exists()){
+                        String teamID = document.getString("teamID");
+                        getEvents(teamID);
                     } else {
-                        Log.d(TAG, "profile has no team");
+                        Log.d(TAG, "No such document");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             }
         });
-        init();
-        getEvents();
         return view;
     }
 
     private void init(){
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         eventView.setLayoutManager(linearLayoutManager);
+        mAuth = FirebaseAuth.getInstance();
+        user_id = mAuth.getCurrentUser().getUid();
     }
 
-    private void getEvents(){
-        Query  query = mFStore.collection("Teams/YfLa27NWaaQSfNwhZPgX/Events")
+    private void getEvents(String team_id){
+        Query  query = mFStore.collection("Teams/"+team_id+"/Events")
                 .whereGreaterThan("date", currentDate)
                 .orderBy("date", Query.Direction.ASCENDING);
 
@@ -123,6 +122,16 @@ public class FragmentEvents extends Fragment {
                 holder.monthText.setText(model.getMonth());
                 holder.timeText.setText(model.getTime());
                 holder.locationText.setText(model.getLocation());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getContext(), EventViewActivity.class);
+                        String eventID = model.getEventID();
+                        i.putExtra("event_id", eventID);
+                        Log.d(TAG, "I put "+eventID+" into the intent");
+                        startActivity(i);
+                    }
+                });
             }
 
 
@@ -143,6 +152,7 @@ public class FragmentEvents extends Fragment {
 
         adapter.notifyDataSetChanged();
         eventView.setAdapter(adapter);
+        adapter.startListening();
     }
 
     public class EventHolder extends RecyclerView.ViewHolder {
@@ -165,7 +175,9 @@ public class FragmentEvents extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
+        if (adapter != null){
+            adapter.startListening();
+        }
     }
 
     @Override
@@ -177,10 +189,6 @@ public class FragmentEvents extends Fragment {
     @Override public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-    }
-
-    public void setTeamID(String teamid){
-        this.team_id = teamid;
     }
 
 }
