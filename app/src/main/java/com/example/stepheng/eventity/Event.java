@@ -3,6 +3,7 @@ package com.example.stepheng.eventity;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by stepheng on 05/03/2018.
@@ -16,11 +17,12 @@ public class Event {
     private String description;
     private String time;
     private String eventID;
+    private List<WaitlistMember> going;
 
 
     public Event(){}
 
-    public Event(String title, Date date, String creatorID, String location, String description, String time, String eventID) {
+    public Event(String title, Date date, String creatorID, String location, String description, String time, String eventID, List<WaitlistMember> going) {
         this.title = title;
         this.date = date;
         this.creatorID = creatorID;
@@ -28,6 +30,24 @@ public class Event {
         this.description = description;
         this.time = time;
         this.eventID = eventID;
+        this.going = going;
+    }
+
+    public List<WaitlistMember> getGoing() {
+        return going;
+    }
+
+    public void setGoing(List<WaitlistMember> going) {
+        this.going = going;
+    }
+
+    public int getGoingList() {
+        if (this.going != null){
+            int num = this.going.size();
+            return num;
+        } else {
+            return 0;
+        }
     }
 
     public String getNiceDate(){

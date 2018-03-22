@@ -57,4 +57,7 @@
     <string name="create_btn_text">Create A Team</string>
     <string name="join_team_btn">Join A Team</string>
     <string name="pending_team_text">You have a pending membership request and must wait until the team admin adds you.</string>
+    <string name="btn_going_txt">Going</string>
+    <string name="btn_maybe_txt">Maybe</string>
+    <string name="btn_not_text">Not Going</string>
 </resources>

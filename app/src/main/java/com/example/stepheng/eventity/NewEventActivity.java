@@ -159,7 +159,7 @@ public class NewEventActivity extends AppCompatActivity {
                                 String teamID = document.getString("teamID");
                                 DocumentReference newEvent = mFStore.collection("Teams/"+team_id+"/Events").document();
                                 final String event_id = newEvent.getId();
-                                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time, event_id));
+                                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time, event_id, null));
 
                                 //add a success toast and send to Main Activity
                                 Toast.makeText(NewEventActivity.this, "Event created", Toast.LENGTH_LONG);

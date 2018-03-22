@@ -39,10 +39,11 @@
         android:layout_alignBaseline="@+id/event_going_text"
         android:layout_alignBottom="@+id/event_going_text"
         android:layout_centerHorizontal="true"
-        android:layout_marginEnd="84dp"
         android:layout_marginTop="8dp"
         android:text="@string/event_text_maybe"
         app:layout_constraintEnd_toStartOf="@+id/event_not_text"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/event_going_text"
         app:layout_constraintTop_toBottomOf="@+id/event_maybe_num" />
 
     <TextView
@@ -51,10 +52,11 @@
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="36dp"
         android:layout_marginTop="8dp"
         android:text="@string/event_text_not"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/event_maybe_text"
         app:layout_constraintTop_toBottomOf="@+id/event_not_num" />
 
     <TextView
@@ -77,11 +79,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:text="@string/event_text_going"
         app:layout_constraintEnd_toStartOf="@+id/event_maybe_text"
-        app:layout_constraintHorizontal_bias="0.265"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/event_going_num" />
 
@@ -165,5 +166,42 @@
         android:text="@string/event_location_txt"
         app:layout_constraintStart_toStartOf="@+id/event_date_text"
         app:layout_constraintTop_toBottomOf="@+id/event_date_text" />
+
+    <Button
+        android:id="@+id/btn_going"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_going_txt"
+        app:layout_constraintEnd_toStartOf="@+id/butn_maybe"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_maybe_text" />
+
+    <Button
+        android:id="@+id/butn_maybe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_maybe_txt"
+        app:layout_constraintEnd_toStartOf="@+id/butn_not"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_going"
+        app:layout_constraintTop_toBottomOf="@+id/event_maybe_text" />
+
+    <Button
+        android:id="@+id/butn_not"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_not_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/butn_maybe"
+        app:layout_constraintTop_toBottomOf="@+id/event_not_text" />
 
 </android.support.constraint.ConstraintLayout>
