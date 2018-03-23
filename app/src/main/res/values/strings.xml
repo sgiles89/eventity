@@ -32,6 +32,9 @@
     <string name="bottom_home_text">Home</string>
     <string name="bottom_events_text">Events</string>
     <string name="bottom_notifications_text">Notifications</string>
+    <string name="question_dialog_title">Ask a question</string>
+    <string name="question_dialog_positive">Ask</string>
+    <string name="question_dialog_negative">Cancel</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -60,4 +63,14 @@
     <string name="btn_going_txt">Going</string>
     <string name="btn_maybe_txt">Maybe</string>
     <string name="btn_not_text">Not Going</string>
+    <string name="qna_text"><![CDATA[Q&A]]></string>
+    <string name="question_text">Q:</string>
+    <string name="answer_text">A:</string>
+    <string name="question_text2">Question Text</string>
+    <string name="by_text">by</string>
+    <string name="user_name_text">username</string>
+    <string name="answer_text_2">Answer Text</string>
+    <string name="no_question_text">It seems nobody\'s asked a question yet.</string>
+    <string name="got_question_text">Got a question?</string>
+    <string name="question_btn_text">Ask it now!</string>
 </resources>

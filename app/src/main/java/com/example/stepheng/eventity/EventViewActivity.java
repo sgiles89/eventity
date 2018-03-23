@@ -1,14 +1,25 @@
 package com.example.stepheng.eventity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,8 +30,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +66,14 @@ public class EventViewActivity extends AppCompatActivity {
     @BindView(R.id.btn_going) Button going_btn;
     @BindView(R.id.butn_maybe) Button maybe_btn;
     @BindView(R.id.butn_not) Button not_btn;
+    @BindView(R.id.ask_q_btn) Button ask_q_btn;
+
+
+    //recyclerview variables
+    @BindView(R.id.questions_view) RecyclerView questionView;
+    @BindView(R.id.emptyviewtext) TextView mEmptyListMessage;
+    private FirestoreRecyclerAdapter adapter;
+    LinearLayoutManager linearLayoutManager;
 
 
     @Override
@@ -61,6 +83,8 @@ public class EventViewActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
         mFStore = FirebaseFirestore.getInstance();
+        linearLayoutManager = new LinearLayoutManager(EventViewActivity.this, LinearLayoutManager.VERTICAL, false);
+        questionView.setLayoutManager(linearLayoutManager);
         Intent intent = getIntent();
         final String event_id = intent.getExtras().getString("event_id");
         //retrieving user's Firebase ID
@@ -262,6 +286,58 @@ public class EventViewActivity extends AppCompatActivity {
                                     }
                                 });
 
+                                Query query = mFStore.collection("Teams/"+team_id+"/Questions/")
+                                        .whereEqualTo("eventID", event_id)
+                                        .orderBy("questiontime", Query.Direction.ASCENDING);
+
+                                FirestoreRecyclerOptions<Question> response = new FirestoreRecyclerOptions.Builder<Question>()
+                                        .setQuery(query, Question.class)
+                                        .build();
+
+                                adapter = new FirestoreRecyclerAdapter<Question, EventViewActivity.QuestionHolder>(response) {
+                                    @Override
+                                    public void onBindViewHolder(EventViewActivity.QuestionHolder holder, int position, final Question model) {
+                                        holder.questionText.setText(model.getQuestion());
+                                        holder.byText.setText("by "+model.getAsker()+" on "+model.getQuestiontime());
+                                        if (!model.isAnswered()){
+                                            holder.aText.setVisibility(View.INVISIBLE);
+                                            holder.answerText.setVisibility(View.INVISIBLE);
+                                        } else {
+                                            holder.answerText.setText(model.getAnswer());
+                                        }
+                                    }
+
+
+
+                                    @Override
+                                    public QuestionHolder onCreateViewHolder(ViewGroup group, int i) {
+                                        View view = LayoutInflater.from(group.getContext())
+                                                .inflate(R.layout.qna_layout, group, false);
+                                        return new QuestionHolder(view);
+                                    }
+
+                                    @Override
+                                    public void onDataChanged() {
+                                        // If there are no chat messages, show a view that invites the user to add a message.
+                                        mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+                                    }
+
+                                    @Override
+                                    public void onError(FirebaseFirestoreException e) {
+                                        Log.e("error", e.getMessage());
+                                    }
+                                };
+
+                                adapter.notifyDataSetChanged();
+                                questionView.setAdapter(adapter);
+                                adapter.startListening();
+
+                                ask_q_btn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        askQuestion();
+                                    }
+                                });
 
                             }
                         });
@@ -277,6 +353,21 @@ public class EventViewActivity extends AppCompatActivity {
 
 
     }
+
+    public class QuestionHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.q_text) TextView qText;
+        @BindView(R.id.a_text) TextView aText;
+        @BindView(R.id.by_text) TextView byText;
+        @BindView(R.id.question_text)TextView questionText;
+        @BindView(R.id.answer_text) TextView answerText;
+
+
+        public QuestionHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
     public void updateGoing(int count){
         event_going_number.setText(""+count);
     }
@@ -287,5 +378,51 @@ public class EventViewActivity extends AppCompatActivity {
 
     public void updateNot(int count){
         event_not_number.setText(""+count);
+    }
+
+    public static class AskQuestionFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final EditText question = new EditText(getContext());
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            // 2. Chain together various setter methods to set the dialog characteristics
+            builder.setTitle(R.string.question_dialog_title)
+                    .setView(question);
+
+            builder.setPositiveButton(R.string.question_dialog_positive, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User clicked OK button
+                }
+            });
+            builder.setNegativeButton(R.string.question_dialog_negative, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+
+            // 3. Get the AlertDialog from create()
+            return builder.create();
+        }
+    }
+
+    public void askQuestion() {
+        DialogFragment newFragment = new AskQuestionFragment();
+        newFragment.show(getSupportFragmentManager(), "question");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (adapter != null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 }
