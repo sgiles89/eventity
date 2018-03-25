@@ -1,12 +1,16 @@
 package com.example.stepheng.eventity;
 
+import java.util.Date;
+
 public class Question {
     private String question;
     private String answer;
     private String asker;
+    private String askerID;
     private String answerer;
-    private String questiontime;
-    private String answertime;
+    private String answererID;
+    private Date questiontime;
+    private Date answertime;
     private boolean isAnswered;
     private String eventID;
 
@@ -14,11 +18,13 @@ public class Question {
 
     }
 
-    public Question(String question, String answer, String asker, String answerer, String questiontime, String answertime, boolean isAnswered, String eventID) {
+    public Question(String question, String answer, String asker, String askerID, String answerer, String answererID, Date questiontime, Date answertime, boolean isAnswered, String eventID) {
         this.question = question;
         this.answer = answer;
         this.asker = asker;
+        this.askerID = askerID;
         this.answerer = answerer;
+        this.answererID = answererID;
         this.questiontime = questiontime;
         this.answertime = answertime;
         this.isAnswered = isAnswered;
@@ -57,19 +63,35 @@ public class Question {
         this.answerer = answerer;
     }
 
-    public String getQuestiontime() {
+    public String getAskerID() {
+        return askerID;
+    }
+
+    public void setAskerID(String askerID) {
+        this.askerID = askerID;
+    }
+
+    public String getAnswererID() {
+        return answererID;
+    }
+
+    public void setAnswererID(String answererID) {
+        this.answererID = answererID;
+    }
+
+    public Date getQuestiontime() {
         return questiontime;
     }
 
-    public void setQuestiontime(String questiontime) {
+    public void setQuestiontime(Date questiontime) {
         this.questiontime = questiontime;
     }
 
-    public String getAnswertime() {
+    public Date getAnswertime() {
         return answertime;
     }
 
-    public void setAnswertime(String answertime) {
+    public void setAnswertime(Date answertime) {
         this.answertime = answertime;
     }
 

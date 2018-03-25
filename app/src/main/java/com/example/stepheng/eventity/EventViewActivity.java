@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -28,17 +29,19 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -67,6 +70,9 @@ public class EventViewActivity extends AppCompatActivity {
     @BindView(R.id.butn_maybe) Button maybe_btn;
     @BindView(R.id.butn_not) Button not_btn;
     @BindView(R.id.ask_q_btn) Button ask_q_btn;
+    @BindView(R.id.askq_text) EditText ask_q_text;
+    @BindView(R.id.submit_btn) Button submit_btn;
+    @BindView(R.id.got_question_text) TextView got_q;
 
 
     //recyclerview variables
@@ -335,7 +341,38 @@ public class EventViewActivity extends AppCompatActivity {
                                 ask_q_btn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        askQuestion();
+                                        submit_btn.setVisibility(View.VISIBLE);
+                                        ask_q_text.setVisibility(View.VISIBLE);
+                                        ask_q_btn.setVisibility(View.GONE);
+                                        got_q.setVisibility(View.GONE);
+                                    }
+                                });
+
+                                submit_btn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String myQuestion = ask_q_text.getText().toString();
+                                        Calendar cal = Calendar.getInstance();
+                                        Date questionTime = cal.getTime();
+                                        Question newQuestion = new Question(myQuestion, null, name, user_id, null, null, questionTime, null, false, event_id);
+                                        DocumentReference addNewQuestion = mFStore.collection("Teams/"+team_id+"/Questions").document();
+                                        addNewQuestion.set(newQuestion).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()){
+                                                    Toast.makeText(EventViewActivity.this, "Question Submitted", Toast.LENGTH_LONG).show();
+                                                    submit_btn.setVisibility(View.GONE);
+                                                    ask_q_text.setVisibility(View.GONE);
+                                                    ask_q_btn.setVisibility(View.VISIBLE);
+                                                    got_q.setVisibility(View.VISIBLE);
+
+                                                } else {
+                                                    Toast.makeText(EventViewActivity.this, "Question submission failed. Please try again later", Toast.LENGTH_LONG).show();
+                                                }
+
+
+                                            }
+                                        });
                                     }
                                 });
 
@@ -378,38 +415,6 @@ public class EventViewActivity extends AppCompatActivity {
 
     public void updateNot(int count){
         event_not_number.setText(""+count);
-    }
-
-    public static class AskQuestionFragment extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final EditText question = new EditText(getContext());
-            // 1. Instantiate an AlertDialog.Builder with its constructor
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-            // 2. Chain together various setter methods to set the dialog characteristics
-            builder.setTitle(R.string.question_dialog_title)
-                    .setView(question);
-
-            builder.setPositiveButton(R.string.question_dialog_positive, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // User clicked OK button
-                }
-            });
-            builder.setNegativeButton(R.string.question_dialog_negative, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // User cancelled the dialog
-                }
-            });
-
-            // 3. Get the AlertDialog from create()
-            return builder.create();
-        }
-    }
-
-    public void askQuestion() {
-        DialogFragment newFragment = new AskQuestionFragment();
-        newFragment.show(getSupportFragmentManager(), "question");
     }
 
     @Override
