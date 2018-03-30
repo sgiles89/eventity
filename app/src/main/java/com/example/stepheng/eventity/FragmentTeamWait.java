@@ -2,7 +2,8 @@ package com.example.stepheng.eventity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,13 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,25 +33,29 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
-public class AdminMainActivity extends AppCompatActivity {
+public class FragmentTeamWait extends Fragment {
+
+    private static final String TAG = "FragmentTeamWait";
 
     @BindView(R.id.waitlist)
     RecyclerView waitlist;
 
     private FirebaseFirestore mFStore;
     private FirebaseAuth mAuth;
+    private String user_id;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
+    @BindView(R.id.empty_waitlist_text) TextView mEmptyListMessage;
+    private Unbinder unbinder;
 
-    private String user_id;
-    private String TAG = "AdminMainActivity";
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_main);
-        ButterKnife.bind(this);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.team_wait_fragment, container, false);
+        unbinder = ButterKnife.bind(this, view);
         init();
         DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
         teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -68,20 +74,19 @@ public class AdminMainActivity extends AppCompatActivity {
                 }
             }
         });
-
+        return view;
     }
 
     private void init(){
-        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         waitlist.setLayoutManager(linearLayoutManager);
-        mFStore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        mFStore = FirebaseFirestore.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
     }
 
     private void getWaitList(final String team_id){
         Query query = mFStore.collection("Teams/"+team_id +"/Waitlist");
-
         FirestoreRecyclerOptions<WaitlistMember> response = new FirestoreRecyclerOptions.Builder<WaitlistMember>()
                 .setQuery(query, WaitlistMember.class)
                 .build();
@@ -100,22 +105,22 @@ public class AdminMainActivity extends AppCompatActivity {
                         DocumentReference memberList = mFStore.collection("Teams/"+team_id+"/Members").document(model.getUserID());
                         Map<String, Object> newMember = new HashMap<>();
                         newMember.put("name", model.getName());
-                        newMember.put("role", "user");
+                        newMember.put("role", "member");
                         newMember.put("userID",model.getUserID());
                         batch.set(memberList, newMember);
                         DocumentReference waitListRef = mFStore.collection("Teams/"+team_id+"/Waitlist").document(model.getUserID());
                         batch.delete(waitListRef);
                         DocumentReference userProfileRef = mFStore.collection("Users/"+model.getUserID()+"/Membership").document("Membership");
-                        batch.update(userProfileRef,"role", "user");
+                        batch.update(userProfileRef,"role", "member");
 
                         // Commit the batch
                         batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()){
-                                    Toast.makeText(AdminMainActivity.this, model.getName()+" was added to the team", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), model.getName()+" was added to the team", Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(AdminMainActivity.this, "failure"+task.getException(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), "failure"+task.getException(), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
@@ -126,7 +131,21 @@ public class AdminMainActivity extends AppCompatActivity {
                 holder.reject.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(AdminMainActivity.this, model.getName()+" was rejected", Toast.LENGTH_LONG).show();
+                        mFStore.collection("Teams/"+team_id+"/Waitlist").document(model.getUserID())
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error deleting document", e);
+                                    }
+                                });
+                        Toast.makeText(getContext(), model.getName()+" was rejected", Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -139,6 +158,12 @@ public class AdminMainActivity extends AppCompatActivity {
                         .inflate(R.layout.waitlist_layout, group, false);
 
                 return new WaitlistMemberHolder(view);
+            }
+
+            @Override
+            public void onDataChanged() {
+                // If there are no chat messages, show a view that invites the user to add a message.
+                mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             }
 
             @Override

@@ -250,8 +250,4 @@ public class FragmentHome extends Fragment {
         unbinder.unbind();
     }
 
-    public void setTeamID(String teamid){
-        this.team_id = teamid;
-    }
-
 }

@@ -75,4 +75,15 @@
     <string name="question_btn_text">Ask it now!</string>
     <string name="askq_hint">Your question...</string>
     <string name="submit">Submit</string>
+    <string name="title_activity_admin_panel">AdminPanelActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="team_mgmt_text">Manage Members</string>
+    <string name="team_waitlist_text">Waitlist</string>
+    <string name="questions_tab_text">Questions</string>
+    <string name="empty_waitlist_text">There are currently not members waiting to access the team. Once a user requests to join the team their name will appear here.</string>
+    <string name="empty_memberlist_txt">Your team is currently empty. Spread the word!</string>
 </resources>

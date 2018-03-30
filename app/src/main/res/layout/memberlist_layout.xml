@@ -7,7 +7,7 @@
 
 
     <TextView
-        android:id="@+id/waitlist_name"
+        android:id="@+id/member_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -15,12 +15,12 @@
         android:layout_marginTop="16dp"
         android:text="Joe Bloggs Jr."
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
-        app:layout_constraintEnd_toStartOf="@+id/waitlist_accept"
+        app:layout_constraintEnd_toStartOf="@+id/memberlist_adjust"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/waitlist_accept"
+        android:id="@+id/memberlist_adjust"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -28,17 +28,17 @@
         android:backgroundTint="@color/colorAccent"
         android:text="Accept"
         android:textColor="@android:color/white"
-        app:layout_constraintEnd_toStartOf="@+id/waitlist_reject"
+        app:layout_constraintEnd_toStartOf="@+id/memberlist_remove"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/waitlist_reject"
+        android:id="@+id/memberlist_remove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/colorPrimary"
-        android:text="Reject"
+        android:text="Remove"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -193,9 +193,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendtoAdminMain() {
-        Intent mainAdminItent = new Intent(MainActivity.this, AdminMainActivity.class);
+        Intent mainAdminItent = new Intent(MainActivity.this, AdminPanelActivity.class);
         startActivity(mainAdminItent);
-        finish();
     }
 
     private void sendToProfile() {

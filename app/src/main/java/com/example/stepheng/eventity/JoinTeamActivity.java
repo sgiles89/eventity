@@ -108,13 +108,10 @@ public class JoinTeamActivity extends AppCompatActivity {
                             teamId = teamResults.get(0).toString();
 
                             DocumentReference joinWaitlist = mFStore.collection("Teams/"+teamId+"/Waitlist").document(user_id);
-                            //create Member data hashmap
-                            Map<String, Object> waitlistData = new HashMap<>();
-                            waitlistData.put("name", display_name);
-                            waitlistData.put("role", "user");
-                            waitlistData.put("userID", user_id);
+
+                            WaitlistMember newWaitListMember = new WaitlistMember(display_name, user_id, "member");
                             //put user in the waitlist
-                            joinWaitlist.set(waitlistData);
+                            joinWaitlist.set(newWaitListMember);
                             //updating user profile with pending membership for new team
                             DocumentReference updateMemberships = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
                             Map<String, Object> membershipData = new HashMap<>();

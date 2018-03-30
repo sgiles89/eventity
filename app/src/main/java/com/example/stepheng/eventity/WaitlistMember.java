@@ -14,7 +14,7 @@ public class WaitlistMember {
         this.name = name;
         this.userID = userID;
         this.role = role;
-    }
+}
 
     public String getName() {
         return name;

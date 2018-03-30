@@ -34,7 +34,11 @@
         <activity android:name=".JoinTeamActivity" />
         <activity android:name=".AdminMainActivity" />
         <activity android:name=".NewEventActivity" />
-        <activity android:name=".EventViewActivity"></activity>
+        <activity android:name=".EventViewActivity" />
+        <activity
+            android:name=".AdminPanelActivity"
+            android:label="@string/title_activity_admin_panel"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
