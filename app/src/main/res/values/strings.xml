@@ -86,4 +86,6 @@
     <string name="questions_tab_text">Questions</string>
     <string name="empty_waitlist_text">There are currently not members waiting to access the team. Once a user requests to join the team their name will appear here.</string>
     <string name="empty_memberlist_txt">Your team is currently empty. Spread the word!</string>
+    <string name="unanswered_questions_text">Unanswered Questions</string>
+    <string name="empty_admin_questions_txt">Well done! There are currently no open questions from your team!</string>
 </resources>

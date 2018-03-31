@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,20 +105,27 @@ public class FragmentTeamMGMT extends Fragment {
                 //set the adjust text to "make admin" for users and "demote" for admins
                 if (model.getRole().equals("member")){
                     holder.adjust.setText("Make Admin");
+                    holder.adjust.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            adjustMembership(team_id, model.getUserID(), model.getName(), "admin");
+                        }
+                    });
                 } else {
                     holder.adjust.setText("Demote");
+                    holder.adjust.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            adjustMembership(team_id, model.getUserID(), model.getName(), "member");
+                        }
+                    });
                 }
                 holder.textName.setText(model.getName());
-                holder.adjust.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(getContext(), "adjust was clicked", Toast.LENGTH_LONG).show();
-                    }
-                });
+
                 holder.remove.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getContext(), "remove was clicked", Toast.LENGTH_LONG).show();
+                        removeMember(team_id, model.getUserID(), model.getName());
                     }
                 });
             }
@@ -146,6 +155,56 @@ public class FragmentTeamMGMT extends Fragment {
         adapter.notifyDataSetChanged();
         memberlist.setAdapter(adapter);
         adapter.startListening();
+    }
+
+    private void adjustMembership(String team_id, String user_id, final String name, final String option){
+        WriteBatch adjustBatch = mFStore.batch();
+        //change the membership status to the option
+        DocumentReference adjustMember = mFStore.collection("Teams/"+team_id+"/Members").document(user_id);
+        adjustBatch.update(adjustMember, "role", option);
+        //change the membership on the profile to reflect this
+        DocumentReference adjustProfile = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        adjustBatch.update(adjustProfile, "role", option);
+        adjustBatch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    if (option.equals("admin")){
+                        Toast.makeText(getActivity(), name+" has been made promoted to Admin", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getContext(), name+" has been demoted to a member", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if (option.equals("admin")){
+                        Toast.makeText(getContext(), name+" could not been promoted to Admin at this time. Please try again later", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getContext(), name+" could not been demoted to Member at this time. Please try again later", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+
+    private void removeMember(String team_id, String user_id, final String name) {
+        WriteBatch removeBatch = mFStore.batch();
+        //find and delete the user for the members collection
+        DocumentReference removeMember = mFStore.document("Teams/"+team_id+"/Members/"+user_id);
+        removeBatch.delete(removeMember);
+        //find and delete the users membership document from their profile
+        DocumentReference membershipRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        removeBatch.delete(membershipRef);
+        //commit the batch
+        removeBatch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(getContext(), name+" has been removed from the team", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext(), name+" could not be removed at this time. Please try again later", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
     }
 
     public class WaitlistMemberHolder extends RecyclerView.ViewHolder {

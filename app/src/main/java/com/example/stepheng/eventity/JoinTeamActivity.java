@@ -117,6 +117,7 @@ public class JoinTeamActivity extends AppCompatActivity {
                             Map<String, Object> membershipData = new HashMap<>();
                             membershipData.put("teamID", teamId);
                             membershipData.put("role", "pending");
+                            membershipData.put("name", display_name);
                             updateMemberships.set(membershipData);
 
                             //show success message and send to Main Activity

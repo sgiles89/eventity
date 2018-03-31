@@ -354,8 +354,9 @@ public class EventViewActivity extends AppCompatActivity {
                                         String myQuestion = ask_q_text.getText().toString();
                                         Calendar cal = Calendar.getInstance();
                                         Date questionTime = cal.getTime();
-                                        Question newQuestion = new Question(myQuestion, null, name, user_id, null, null, questionTime, null, false, event_id);
                                         DocumentReference addNewQuestion = mFStore.collection("Teams/"+team_id+"/Questions").document();
+                                        String questionID = addNewQuestion.getId();
+                                        Question newQuestion = new Question(myQuestion, null, name, user_id, null, null, questionTime, null, false, event_id, questionID);
                                         addNewQuestion.set(newQuestion).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {

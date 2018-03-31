@@ -13,12 +13,13 @@ public class Question {
     private Date answertime;
     private boolean isAnswered;
     private String eventID;
+    private String questionID;
 
     public Question(){
 
     }
 
-    public Question(String question, String answer, String asker, String askerID, String answerer, String answererID, Date questiontime, Date answertime, boolean isAnswered, String eventID) {
+    public Question(String question, String answer, String asker, String askerID, String answerer, String answererID, Date questiontime, Date answertime, boolean isAnswered, String eventID, String questionID) {
         this.question = question;
         this.answer = answer;
         this.asker = asker;
@@ -29,6 +30,7 @@ public class Question {
         this.answertime = answertime;
         this.isAnswered = isAnswered;
         this.eventID = eventID;
+        this.questionID = questionID;
     }
 
     public String getQuestion() {
@@ -109,5 +111,13 @@ public class Question {
 
     public void setEventID(String eventID) {
         this.eventID = eventID;
+    }
+
+    public String getQuestionID() {
+        return questionID;
+    }
+
+    public void setQuestionID(String questionID) {
+        this.questionID = questionID;
     }
 }
