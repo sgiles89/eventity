@@ -2,182 +2,220 @@ package com.example.stepheng.eventity;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Optional;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
     private android.support.v7.widget.Toolbar mainToolbar;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
-    @BindView(R.id.add_event_btn) FloatingActionButton nFAB;
-    @BindView(R.id.mainBottomNav) BottomNavigationView mainBottomNav;
-    private FragmentHome homeFragment;
-    private FragmentEvents eventsFragment;
-    private FragmentNotifications notificationsFragment;
-    private FragmentNoTeam noTeamFragment;
-    private FragmentPendingTeam pendingTeamFragment;
+    private MainFragment mainFragment;
+    private AdminFragment adminFragment;
+    private CircleImageView navProfileImage;
+    private Uri profileImageURI = null;
     private String user_id;
+    private View navHeader;
+    private TextView navName;
+    private TextView navRole;
+
     private String TAG = "MainActivity";
+    @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mAuth = FirebaseAuth.getInstance();
-        mFStore = FirebaseFirestore.getInstance();
 
         //check for logged in user
+        mAuth = FirebaseAuth.getInstance();
+        mFStore = FirebaseFirestore.getInstance();
         if (mAuth.getCurrentUser() == null) {
             Intent newIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(newIntent);
         }
         else{
-            user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            user_id = mAuth.getInstance().getCurrentUser().getUid();
         }
 
-        //Setting up fragments
-        homeFragment = new FragmentHome();
-        notificationsFragment = new FragmentNotifications();
-        eventsFragment = new FragmentEvents();
-        noTeamFragment = new FragmentNoTeam();
-        pendingTeamFragment = new FragmentPendingTeam();
+        mainFragment = new MainFragment();
+        adminFragment = new AdminFragment();
 
         mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setTitle("Eventity");
-        nFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newPost = new Intent(MainActivity.this, NewEventActivity.class);
-                startActivity(newPost);
-            }
-        });
 
-        //check for pending/no team
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
         checkTeamStatus();
+        navHeader = navigationView.getHeaderView(0);
+        navProfileImage = navHeader.findViewById(R.id.nav_profile_image);
+        navName = navHeader.findViewById(R.id.navbar_name);
+        navRole = navHeader.findViewById(R.id.navbar_role);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
 
+                        switch (menuItem.getItemId()){
+                            case R.id.nav_home:
+                                switchFragment(mainFragment);
+                                break;
 
-        mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-                switch (item.getItemId()){
-
-                    case R.id.bottom_action_home :
-                        switchFragment(homeFragment);
-                        return true;
-
-                    case R.id.bottom_action_events :
-                        switchFragment(eventsFragment);
-                        return true;
-
-                    case R.id.bottom_action_notifications :
-                        switchFragment(notificationsFragment);
-                        return true;
-
-                    default:
-                        return false;
-                }
-
-
-            }
-        });
-    }
-
-    private void checkTeamStatus() {
-        DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-        teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        Log.d(TAG, "document exists");
-                        if (document.getString("role").equals("pending")){
-                            nFAB.setVisibility(View.INVISIBLE);
-                            switchFragment(pendingTeamFragment);
-                        } else if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
-                            switchFragment(homeFragment);
-                        } else if(document.getString("role").equals("user")){
-                            nFAB.setVisibility(View.INVISIBLE);
-                            switchFragment(homeFragment);
+                            case R.id.nav_admin:
+                                switchFragment(adminFragment);
+                                break;
                         }
-                    } else {
-                        switchFragment(noTeamFragment);
+
+
+                        return true;
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
+                });
+
+
+
+
+
+
+
+        final DocumentReference profileRef = mFStore.document("Users/"+user_id);
+        final DocumentReference membershipRef = mFStore.document("Users/"+user_id+"/Membership/Membership");
+
+        profileRef.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            String name = task.getResult().getString("name");
+                            String image = task.getResult().getString("image");
+                            Glide.with(MainActivity.this).load(image).into(navProfileImage);
+                            navName.setText(name);
+                        }
+                    }
+                });
+        membershipRef.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document != null && document.exists()) {
+                                String team = document.getString("teamName");
+                                String role = document.getString("role");
+                                if (role.equals("pending")){
+                                    navRole.setVisibility(View.GONE);
+                                }else {
+                                    String capitalisedrole = role.substring(0, 1).toUpperCase() + role.substring(1);
+                                    navRole.setText(capitalisedrole + " of " + team);
+                                }
+
+                            } else {
+                                navRole.setVisibility(View.GONE);
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+
+                        }
+                    }
+                });
+
+
+
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.main, menu);
+            getMenuInflater().inflate(R.menu.main, menu);
 
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()){
-
-            case R.id.action_logout_btn:
-                logOut();
-                return true;
-
-            case R.id.action_profile_button:
-                sendToProfile();
-                return true;
-
-            case R.id.action_admin_panel:
-                sendtoAdminMain();
-                return true;
-
-            case R.id.action_join_team:
-                sentToJoinTeam();
-                return true;
-
-            case R.id.action_create_team:
-                sendtoCreateTeam();
-                return true;
-
-            default:
-                return false;
+            return true;
         }
-    }
 
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+
+            switch (item.getItemId()){
+
+                case R.id.action_logout_btn:
+                    logOut();
+                    return true;
+
+                case R.id.action_profile_button:
+                    sendToProfile();
+                    return true;
+
+                case R.id.action_admin_panel:
+                    sendtoAdminMain();
+                    return true;
+
+                case R.id.action_join_team:
+                    sentToJoinTeam();
+                    return true;
+
+                case R.id.action_create_team:
+                    sendtoCreateTeam();
+                    return true;
+
+                case android.R.id.home:
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     @Override
     protected void onStart(){
         super.onStart();
-        checkTeamStatus();
+        switchFragment(mainFragment);
     }
 
     private void sendtoCreateTeam() {
@@ -193,8 +231,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendtoAdminMain() {
-        Intent mainAdminItent = new Intent(MainActivity.this, AdminPanelActivity.class);
-        startActivity(mainAdminItent);
+        switchFragment(adminFragment);
     }
 
     private void sendToProfile() {
@@ -218,7 +255,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.main_container, fragment);
+        fragmentTransaction.replace(R.id.fragment_holder, fragment);
         fragmentTransaction.commit();
+    }
+
+    private void checkTeamStatus() {
+        DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        Log.d(TAG, "document exists");
+                        if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
+                        } else {
+                            hideItem();
+                        }
+                    } else {
+                        hideItem();
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void hideItem()
+    {
+        NavigationView navView = findViewById(R.id.nav_view);
+        Menu nav_Menu = navView.getMenu();
+        nav_Menu.findItem(R.id.nav_admin).setVisible(false);
     }
 }

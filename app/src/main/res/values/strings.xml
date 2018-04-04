@@ -88,4 +88,9 @@
     <string name="empty_memberlist_txt">Your team is currently empty. Spread the word!</string>
     <string name="unanswered_questions_text">Unanswered Questions</string>
     <string name="empty_admin_questions_txt">Well done! There are currently no open questions from your team!</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_ep">Edit Profile</string>
+    <string name="nav_admin">Admin Panel</string>
+    <string name="navbar_name" >First Name LastName</string>
+    <string name="navbar_role">Member of Team</string>
 </resources>
