@@ -10,8 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -56,6 +59,7 @@ public class EventViewActivity extends AppCompatActivity {
     //declaring user,team and event variables
     private String user_id;
     private String TAG = "EventViewActivity";
+    private android.support.v7.widget.Toolbar toolbar;
 
     //declaring and binding UI elements
     @BindView(R.id.event_title_text) TextView event_title;
@@ -89,6 +93,10 @@ public class EventViewActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
         mFStore = FirebaseFirestore.getInstance();
+        toolbar = findViewById(R.id.event_view_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         linearLayoutManager = new LinearLayoutManager(EventViewActivity.this, LinearLayoutManager.VERTICAL, false);
         questionView.setLayoutManager(linearLayoutManager);
         Intent intent = getIntent();
@@ -390,6 +398,29 @@ public class EventViewActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.admin_event_view, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.admin_edit_event:
+                return true;
+
+            case R.id.admin_delete_event:
+
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     public class QuestionHolder extends RecyclerView.ViewHolder {

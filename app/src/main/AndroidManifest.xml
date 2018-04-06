@@ -18,7 +18,6 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -30,11 +29,15 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" /> <!-- optional (needed if default theme has no action bar) -->
-        <activity android:name=".TeamCreationActivity" />
-        <activity android:name=".JoinTeamActivity" />
+        <activity android:name=".TeamCreationActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".JoinTeamActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".AdminMainActivity" />
-        <activity android:name=".NewEventActivity" />
-        <activity android:name=".EventViewActivity" />
+        <activity android:name=".NewEventActivity"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".EventViewActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".AdminPanelActivity"
             android:label="@string/title_activity_admin_panel"
