@@ -17,12 +17,11 @@ public class Event {
     private String description;
     private String time;
     private String eventID;
-    private List<WaitlistMember> going;
 
 
     public Event(){}
 
-    public Event(String title, Date date, String creatorID, String location, String description, String time, String eventID, List<WaitlistMember> going) {
+    public Event(String title, Date date, String creatorID, String location, String description, String time, String eventID) {
         this.title = title;
         this.date = date;
         this.creatorID = creatorID;
@@ -30,24 +29,6 @@ public class Event {
         this.description = description;
         this.time = time;
         this.eventID = eventID;
-        this.going = going;
-    }
-
-    public List<WaitlistMember> getGoing() {
-        return going;
-    }
-
-    public void setGoing(List<WaitlistMember> going) {
-        this.going = going;
-    }
-
-    public int getGoingList() {
-        if (this.going != null){
-            int num = this.going.size();
-            return num;
-        } else {
-            return 0;
-        }
     }
 
     public String getNiceDate(){
@@ -92,12 +73,44 @@ public class Event {
         return eventMonth;
     }
 
+    public String getDayofWeek(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.date);
+        int dayofWeek =  cal.get(Calendar.DAY_OF_WEEK);
+        String eventDay;
+        switch (dayofWeek){
+            case 1: eventDay = "Sunday";
+                break;
+            case 2: eventDay = "Monday";
+                break;
+            case 3: eventDay = "Tuesday";
+                break;
+            case 4: eventDay = "Wednesday";
+                break;
+            case 5: eventDay = "Thursday";
+                break;
+            case 6: eventDay = "Friday";
+                break;
+            case 7: eventDay = "Saturday";
+                break;
+            default: eventDay = "Invalid Day";
+                break;
+        }
+        return eventDay;
+    }
+
     public String getDay(){
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.date);
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        String dayString = String.valueOf(day);
-        return dayString;
+        if (day < 10) {
+            String dayString = "0" + String.valueOf(day);
+            return dayString;
+        } else {
+            String dayString = String.valueOf(day);
+            return dayString;
+        }
+
     }
     public String getTitle() {
         return title;

@@ -138,7 +138,6 @@ public class FragmentQuestionMGMT extends Fragment {
 
             @Override
             public void onDataChanged() {
-                // If there are no chat messages, show a view that invites the user to add a message.
                 mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             }
 

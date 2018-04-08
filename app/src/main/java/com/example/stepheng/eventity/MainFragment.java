@@ -61,7 +61,6 @@ public class MainFragment extends Fragment {
         mFStore = FirebaseFirestore.getInstance();
 
         //Setting up fragments
-
         homeFragment = new FragmentHome();
         notificationsFragment = new FragmentNotifications();
         eventsFragment = new FragmentEvents();
@@ -76,8 +75,14 @@ public class MainFragment extends Fragment {
             }
         });
 
-        //check for pending/no team
-        user_id = mAuth.getCurrentUser().getUid();
+        //if not logged in, send to login
+        if (mAuth.getCurrentUser() == null) {
+            Intent newIntent = new Intent(getContext(), LoginActivity.class);
+            startActivity(newIntent);
+        }
+        else{
+            user_id = mAuth.getInstance().getCurrentUser().getUid();
+        }
         checkTeamStatus();
 
         mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

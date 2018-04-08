@@ -1,5 +1,6 @@
 package com.example.stepheng.eventity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Question {
@@ -14,6 +15,8 @@ public class Question {
     private boolean isAnswered;
     private String eventID;
     private String questionID;
+    private String niceQuestiontime;
+    private String niceAnswertime;
 
     public Question(){
 
@@ -32,6 +35,25 @@ public class Question {
         this.eventID = eventID;
         this.questionID = questionID;
     }
+
+
+    public String getNiceQuestiontime() {
+
+        SimpleDateFormat niceDate = new SimpleDateFormat("MMMM dd yyyy");
+        String niceQuestiontime = niceDate.format(this.questiontime);
+        return niceQuestiontime;
+    }
+
+
+    public String getNiceAnswertime() {
+        SimpleDateFormat niceDate = new SimpleDateFormat("MMMM dd yyyy");
+        String niceAnswertime = niceDate.format(this.questiontime);
+        return niceAnswertime;
+    }
+
+
+
+
 
     public String getQuestion() {
         return question;

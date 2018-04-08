@@ -35,8 +35,6 @@
     <string name="question_dialog_title">Ask a question</string>
     <string name="question_dialog_positive">Ask</string>
     <string name="question_dialog_negative">Cancel</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="upcoming_event_txt">Upcoming Events</string>
     <string name="past_event_text">Past Events</string>
@@ -94,4 +92,12 @@
     <string name="navbar_name" >First Name LastName</string>
     <string name="navbar_role">Member of Team</string>
     <string name="save_btn_txt">SAVE</string>
+    <string name="rsvp">Your RSVP:</string>
+    <string name="empty_list_view_message">This list is empty.</string>
+    <string-array name="rsvp_array">
+        <item>Undecided</item>
+        <item>Going</item>
+        <item>Maybe</item>
+        <item>Not Going</item>
+    </string-array>
 </resources>
