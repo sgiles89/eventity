@@ -55,7 +55,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EventViewActivity extends AppCompatActivity {
+public class EventViewActivity extends AppCompatActivity implements DeleteEventDialog.NoticeDialogListener {
 
     //declaring FireBase variables
     private FirebaseFirestore mFStore;
@@ -106,7 +106,9 @@ public class EventViewActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(EventViewActivity.this, LinearLayoutManager.VERTICAL, false);
         questionView.setLayoutManager(linearLayoutManager);
         Intent intent = getIntent();
+        final String teamsid = intent.getExtras().getString("team_id");
         final String event_id = intent.getExtras().getString("event_id");
+        Log.d(TAG, "The event id is"+event_id+" and the team id is "+teamsid);
         //retrieving user's Firebase ID
 
         if (mAuth.getCurrentUser() == null) {
@@ -128,291 +130,297 @@ public class EventViewActivity extends AppCompatActivity {
                         final String name = document.getString("name");
                         findRSVP(team_id, event_id);
                         final DocumentReference eventInfoRef = mFStore.collection("Teams/"+team_id+"/Events").document(event_id);
-                        eventInfoRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        eventInfoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                final Event thisEvent = documentSnapshot.toObject(Event.class);
-                                //populate fields on the Activity with the event information
-                                getSupportActionBar().setTitle(thisEvent.getTitle());
-                                event_day.setText(thisEvent.getDay());
-                                event_month.setText(thisEvent.getMonth());
-                                event_day_time.setText(thisEvent.getDayofWeek()+" "+thisEvent.getTime());
-                                event_location.setText(thisEvent.getLocation());
-                                event_description.setText((thisEvent.getDescription()));
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    final Event thisEvent = task.getResult().toObject(Event.class);
+                                    //populate fields on the Activity with the event information
+                                    getSupportActionBar().setTitle(thisEvent.getTitle());
+                                    event_day.setText(thisEvent.getDay());
+                                    event_month.setText(thisEvent.getMonth());
+                                    event_day_time.setText(thisEvent.getDayofWeek() + " " + thisEvent.getTime());
+                                    event_location.setText(thisEvent.getLocation());
+                                    event_description.setText((thisEvent.getDescription()));
 
-                                //spinner logic
-                                rsvp_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                        if (rsvp_spinner.getSelectedItem().toString().equals("Going")){
-                                            final DocumentReference goingRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Going/"+user_id);
-                                            final DocumentReference maybeRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Maybe/"+user_id);
-                                            final DocumentReference notRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Not/"+user_id);
-                                            mFStore.runTransaction(new Transaction.Function<Void>() {
-                                                @Override
-                                                public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                                                    Map<String, Object> goingMap = new HashMap<>();
-                                                    goingMap.put("name", name);
-                                                    goingMap.put("userID", user_id);
+                                    //spinner logic
+                                    rsvp_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                        @Override
+                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                            if (rsvp_spinner.getSelectedItem().toString().equals("Going")) {
+                                                final DocumentReference goingRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Going/" + user_id);
+                                                final DocumentReference maybeRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Maybe/" + user_id);
+                                                final DocumentReference notRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Not/" + user_id);
+                                                mFStore.runTransaction(new Transaction.Function<Void>() {
+                                                    @Override
+                                                    public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                                                        Map<String, Object> goingMap = new HashMap<>();
+                                                        goingMap.put("name", name);
+                                                        goingMap.put("userID", user_id);
 
-                                                    DocumentSnapshot maybeSnapshot = transaction.get(maybeRef);
-                                                    DocumentSnapshot notSnapshot = transaction.get(notRef);
-                                                    if (maybeSnapshot.exists()){
-                                                        maybeRef.delete();
-                                                        goingRef.set(goingMap);
+                                                        DocumentSnapshot maybeSnapshot = transaction.get(maybeRef);
+                                                        DocumentSnapshot notSnapshot = transaction.get(notRef);
+                                                        if (maybeSnapshot.exists()) {
+                                                            maybeRef.delete();
+                                                            goingRef.set(goingMap);
 
-                                                    } else if (notSnapshot.exists()) {
-                                                        notRef.delete();
-                                                        goingRef.set(goingMap);
-                                                    } else {
-                                                        goingRef.set(goingMap);
-                                                    }
-                                                    // Success
-                                                    return null;
-                                                }
-                                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "Transaction success!");
-                                                }
-                                            })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w(TAG, "Transaction failure.", e);
+                                                        } else if (notSnapshot.exists()) {
+                                                            notRef.delete();
+                                                            goingRef.set(goingMap);
+                                                        } else {
+                                                            goingRef.set(goingMap);
                                                         }
-                                                    });
-                                        } else if (rsvp_spinner.getSelectedItem().toString().equals("Maybe")){
-                                            final DocumentReference goingRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Going/"+user_id);
-                                            final DocumentReference maybeRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Maybe/"+user_id);
-                                            final DocumentReference notRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Not/"+user_id);
-                                            mFStore.runTransaction(new Transaction.Function<Void>() {
-                                                @Override
-                                                public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                                                    Map<String, Object> maybeMap = new HashMap<>();
-                                                    maybeMap.put("name", name);
-                                                    maybeMap.put("userID", user_id);
-
-                                                    DocumentSnapshot goingSnapshot = transaction.get(goingRef);
-                                                    DocumentSnapshot notSnapshot = transaction.get(notRef);
-                                                    if (goingSnapshot.exists()){
-                                                        goingRef.delete();
-                                                        maybeRef.set(maybeMap);
-
-                                                    } else if (notSnapshot.exists()) {
-                                                        notRef.delete();
-                                                        maybeRef.set(maybeMap);
-                                                    } else {
-                                                        maybeRef.set(maybeMap);
+                                                        // Success
+                                                        return null;
                                                     }
-                                                    // Success
-                                                    return null;
-                                                }
-                                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "Transaction success!");
-                                                }
-                                            })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w(TAG, "Transaction failure.", e);
-                                                        }
-                                                    });
-                                        } else if (rsvp_spinner.getSelectedItem().toString().equals("Not Going")){
-                                            final DocumentReference goingRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Going/"+user_id);
-                                            final DocumentReference maybeRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Maybe/"+user_id);
-                                            final DocumentReference notRef = mFStore.document("Teams/"+team_id+"/Events/"+event_id+"/Not/"+user_id);
-                                            mFStore.runTransaction(new Transaction.Function<Void>() {
-                                                @Override
-                                                public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                                                    Map<String, Object> notMap = new HashMap<>();
-                                                    notMap.put("name", name);
-                                                    notMap.put("userID", user_id);
-
-                                                    DocumentSnapshot maybeSnapshot = transaction.get(maybeRef);
-                                                    DocumentSnapshot goingSnapshot = transaction.get(goingRef);
-                                                    if (maybeSnapshot.exists()){
-                                                        maybeRef.delete();
-                                                        notRef.set(notMap);
-
-                                                    } else if (goingSnapshot.exists()) {
-                                                        goingRef.delete();
-                                                        notRef.set(notMap);
-                                                    } else {
-                                                        notRef.set(notMap);
+                                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "Transaction success!");
                                                     }
-                                                    // Success
-                                                    return null;
-                                                }
-                                            }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "Transaction success!");
-                                                }
-                                            })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.w(TAG, "Transaction failure.", e);
-                                                        }
-                                                    });
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> parent) {
-
-                                    }
-                                });
-                                //get going count
-                                mFStore.collection("Teams/"+team_id+"/Events/"+event_id+"/Going").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                                        if (!documentSnapshots.isEmpty()){
-                                            int count = documentSnapshots.size();
-                                            updateGoing(count);
-                                        } else {
-                                            updateGoing(0);
-                                        }
-                                    }
-                                });
-
-                                //get maybe count
-                                mFStore.collection("Teams/"+team_id+"/Events/"+event_id+"/Maybe").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                                        if (!documentSnapshots.isEmpty()){
-                                            int count = documentSnapshots.size();
-                                            updateMaybe(count);
-                                        } else {
-                                            updateMaybe(0);
-                                        }
-                                    }
-                                });
-
-                                //get not count
-                                mFStore.collection("Teams/"+team_id+"/Events/"+event_id+"/Not").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                                        if (!documentSnapshots.isEmpty()){
-                                            int count = documentSnapshots.size();
-                                            updateNot(count);
-                                        } else {
-                                            updateNot(0);
-                                        }
-                                    }
-                                });
-
-                                Query query = mFStore.collection("Teams/"+team_id+"/Questions/")
-                                        .whereEqualTo("eventID", event_id)
-                                        .orderBy("questiontime", Query.Direction.ASCENDING);
-
-                                FirestoreRecyclerOptions<Question> response = new FirestoreRecyclerOptions.Builder<Question>()
-                                        .setQuery(query, Question.class)
-                                        .build();
-
-                                adapter = new FirestoreRecyclerAdapter<Question, EventViewActivity.QuestionHolder>(response) {
-                                    @Override
-                                    public void onBindViewHolder(EventViewActivity.QuestionHolder holder, int position, final Question model) {
-                                        holder.questionText.setText(model.getQuestion());
-                                        holder.byText.setText("by "+model.getAsker()+" on "+model.getNiceQuestiontime());
-                                        if (!model.isAnswered()){
-                                            holder.aText.setVisibility(View.INVISIBLE);
-                                            holder.answerText.setVisibility(View.INVISIBLE);
-                                        } else {
-                                            holder.answerText.setText(model.getAnswer());
-                                        }
-                                    }
-
-
-
-                                    @Override
-                                    public QuestionHolder onCreateViewHolder(ViewGroup group, int i) {
-                                        View view = LayoutInflater.from(group.getContext())
-                                                .inflate(R.layout.qna_layout, group, false);
-                                        return new QuestionHolder(view);
-                                    }
-
-                                    @Override
-                                    public void onDataChanged() {
-                                        // If there are no chat messages, show a view that invites the user to add a message.
-                                        mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
-                                    }
-
-                                    @Override
-                                    public void onError(FirebaseFirestoreException e) {
-                                        Log.e("error", e.getMessage());
-                                    }
-                                };
-
-                                adapter.notifyDataSetChanged();
-                                questionView.setAdapter(adapter);
-                                adapter.startListening();
-
-                                event_going_number.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        ListFragment df = ListFragment.newInstance(team_id, event_id, "Going");
-                                        df.show(getFragmentManager(),"Going");
-                                    }
-                                });
-
-                                event_not_number.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        ListFragment df = ListFragment.newInstance(team_id, event_id, "Not");
-                                        df.show(getFragmentManager(),"Not Going");
-                                    }
-                                });
-
-                                event_maybe_number.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        ListFragment df = ListFragment.newInstance(team_id, event_id, "Maybe");
-                                        df.show(getFragmentManager(),"Maybe");
-                                    }
-                                });
-
-                                ask_q_txt.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        final EditText question = new EditText(EventViewActivity.this);
-                                        new AlertDialog.Builder(EventViewActivity.this)
-                                                .setTitle("Ask a question")
-                                                .setMessage("Your question:")
-                                                .setView(question)
-                                                .setPositiveButton("Answer", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                                        String myQuestion = question.getText().toString();
-                                                        Calendar cal = Calendar.getInstance();
-                                                        Date questionTime = cal.getTime();
-                                                        DocumentReference addNewQuestion = mFStore.collection("Teams/"+team_id+"/Questions").document();
-                                                        String questionID = addNewQuestion.getId();
-                                                        Question newQuestion = new Question(myQuestion, null, name, user_id, null, null, questionTime, null, false, event_id, questionID);
-                                                        addNewQuestion.set(newQuestion).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                })
+                                                        .addOnFailureListener(new OnFailureListener() {
                                                             @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()){
-                                                                    Toast.makeText(EventViewActivity.this, "Question Submitted", Toast.LENGTH_LONG).show();
-                                                                } else {
-                                                                    Toast.makeText(EventViewActivity.this, "Question submission failed. Please try again later", Toast.LENGTH_LONG).show();
-                                                                }
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Transaction failure.", e);
                                                             }
                                                         });
+                                            } else if (rsvp_spinner.getSelectedItem().toString().equals("Maybe")) {
+                                                final DocumentReference goingRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Going/" + user_id);
+                                                final DocumentReference maybeRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Maybe/" + user_id);
+                                                final DocumentReference notRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Not/" + user_id);
+                                                mFStore.runTransaction(new Transaction.Function<Void>() {
+                                                    @Override
+                                                    public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                                                        Map<String, Object> maybeMap = new HashMap<>();
+                                                        maybeMap.put("name", name);
+                                                        maybeMap.put("userID", user_id);
+
+                                                        DocumentSnapshot goingSnapshot = transaction.get(goingRef);
+                                                        DocumentSnapshot notSnapshot = transaction.get(notRef);
+                                                        if (goingSnapshot.exists()) {
+                                                            goingRef.delete();
+                                                            maybeRef.set(maybeMap);
+
+                                                        } else if (notSnapshot.exists()) {
+                                                            notRef.delete();
+                                                            maybeRef.set(maybeMap);
+                                                        } else {
+                                                            maybeRef.set(maybeMap);
+                                                        }
+                                                        // Success
+                                                        return null;
+                                                    }
+                                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "Transaction success!");
                                                     }
                                                 })
-                                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Transaction failure.", e);
+                                                            }
+                                                        });
+                                            } else if (rsvp_spinner.getSelectedItem().toString().equals("Not Going")) {
+                                                final DocumentReference goingRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Going/" + user_id);
+                                                final DocumentReference maybeRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Maybe/" + user_id);
+                                                final DocumentReference notRef = mFStore.document("Teams/" + team_id + "/Events/" + event_id + "/Not/" + user_id);
+                                                mFStore.runTransaction(new Transaction.Function<Void>() {
+                                                    @Override
+                                                    public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                                                        Map<String, Object> notMap = new HashMap<>();
+                                                        notMap.put("name", name);
+                                                        notMap.put("userID", user_id);
+
+                                                        DocumentSnapshot maybeSnapshot = transaction.get(maybeRef);
+                                                        DocumentSnapshot goingSnapshot = transaction.get(goingRef);
+                                                        if (maybeSnapshot.exists()) {
+                                                            maybeRef.delete();
+                                                            notRef.set(notMap);
+
+                                                        } else if (goingSnapshot.exists()) {
+                                                            goingRef.delete();
+                                                            notRef.set(notMap);
+                                                        } else {
+                                                            notRef.set(notMap);
+                                                        }
+                                                        // Success
+                                                        return null;
+                                                    }
+                                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "Transaction success!");
+                                                        Log.d(TAG, "Transaction success!");
                                                     }
                                                 })
-                                                .show();
-                                    }
-                                });
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.w(TAG, "Transaction failure.", e);
+                                                            }
+                                                        });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected(AdapterView<?> parent) {
+
+                                        }
+                                    });
+                                    //get going count
+                                    mFStore.collection("Teams/" + team_id + "/Events/" + event_id + "/Going").addSnapshotListener(EventViewActivity.this,new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                                            if (!documentSnapshots.isEmpty()) {
+                                                int count = documentSnapshots.size();
+                                                updateGoing(count);
+                                            } else {
+                                                updateGoing(0);
+                                            }
+                                        }
+                                    });
+
+                                    //get maybe count
+                                    mFStore.collection("Teams/" + team_id + "/Events/" + event_id + "/Maybe").addSnapshotListener(EventViewActivity.this,new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                                            if (!documentSnapshots.isEmpty()) {
+                                                int count = documentSnapshots.size();
+                                                updateMaybe(count);
+                                            } else {
+                                                updateMaybe(0);
+                                            }
+                                        }
+                                    });
+
+                                    //get not count
+                                    mFStore.collection("Teams/" + team_id + "/Events/" + event_id + "/Not").addSnapshotListener(EventViewActivity.this, new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                                            if (!documentSnapshots.isEmpty()) {
+                                                int count = documentSnapshots.size();
+                                                updateNot(count);
+                                            } else {
+                                                updateNot(0);
+                                            }
+                                        }
+                                    });
+
+                                    Query query = mFStore.collection("Teams/" + team_id + "/Questions/")
+                                            .whereEqualTo("eventID", event_id)
+                                            .orderBy("questiontime", Query.Direction.ASCENDING);
+
+                                    FirestoreRecyclerOptions<Question> response = new FirestoreRecyclerOptions.Builder<Question>()
+                                            .setQuery(query, Question.class)
+                                            .build();
+
+                                    adapter = new FirestoreRecyclerAdapter<Question, EventViewActivity.QuestionHolder>(response) {
+                                        @Override
+                                        public void onBindViewHolder(EventViewActivity.QuestionHolder holder, int position, final Question model) {
+                                            holder.questionText.setText(model.getQuestion());
+                                            holder.byText.setText("by " + model.getAsker() + " on " + model.getNiceQuestiontime());
+                                            if (!model.isAnswered()) {
+                                                holder.aText.setVisibility(View.INVISIBLE);
+                                                holder.answerText.setVisibility(View.INVISIBLE);
+                                            } else {
+                                                holder.answerText.setText(model.getAnswer());
+                                            }
+                                        }
 
 
+                                        @Override
+                                        public QuestionHolder onCreateViewHolder(ViewGroup group, int i) {
+                                            View view = LayoutInflater.from(group.getContext())
+                                                    .inflate(R.layout.qna_layout, group, false);
+                                            return new QuestionHolder(view);
+                                        }
 
+                                        @Override
+                                        public void onDataChanged() {
+                                            // If there are no chat messages, show a view that invites the user to add a message.
+                                            mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+                                        }
+
+                                        @Override
+                                        public void onError(FirebaseFirestoreException e) {
+                                            Log.e("error", e.getMessage());
+                                        }
+                                    };
+
+                                    adapter.notifyDataSetChanged();
+                                    questionView.setAdapter(adapter);
+                                    adapter.startListening();
+
+                                    event_going_number.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            ListFragment df = ListFragment.newInstance(team_id, event_id, "Going");
+                                            df.show(getFragmentManager(), "Going");
+                                        }
+                                    });
+
+                                    event_not_number.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            ListFragment df = ListFragment.newInstance(team_id, event_id, "Not");
+                                            df.show(getFragmentManager(), "Not Going");
+                                        }
+                                    });
+
+                                    event_maybe_number.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            ListFragment df = ListFragment.newInstance(team_id, event_id, "Maybe");
+                                            df.show(getFragmentManager(), "Maybe");
+                                        }
+                                    });
+
+                                    ask_q_txt.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            final EditText question = new EditText(EventViewActivity.this);
+                                            new AlertDialog.Builder(EventViewActivity.this)
+                                                    .setTitle("Ask a question")
+                                                    .setMessage("Your question:")
+                                                    .setView(question)
+                                                    .setPositiveButton("Answer", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                                            String myQuestion = question.getText().toString();
+                                                            Calendar cal = Calendar.getInstance();
+                                                            Date questionTime = cal.getTime();
+                                                            DocumentReference addNewQuestion = mFStore.collection("Teams/" + team_id + "/Questions").document();
+                                                            String questionID = addNewQuestion.getId();
+                                                            Question newQuestion = new Question(myQuestion, null, name, user_id, null, null, questionTime, null, false, event_id, questionID);
+                                                            addNewQuestion.set(newQuestion).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        Toast.makeText(EventViewActivity.this, "Question Submitted", Toast.LENGTH_LONG).show();
+                                                                    } else {
+                                                                        Toast.makeText(EventViewActivity.this, "Question submission failed. Please try again later", Toast.LENGTH_LONG).show();
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                                        }
+                                                    })
+                                                    .show();
+                                        }
+                                    });
+
+
+                                } else {
+                                    Toast.makeText(EventViewActivity.this, "This event doesn't exist", Toast.LENGTH_LONG).show();
+                                    Intent mainIntent = new Intent (EventViewActivity.this, MainActivity.class);
+                                    startActivity(mainIntent);
+                                    finish();
+                                }
                             }
                         });
                     } else {
@@ -436,17 +444,55 @@ public class EventViewActivity extends AppCompatActivity {
         return true;
     }
 
+    public void showNoticeDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new DeleteEventDialog();
+        dialog.show(getSupportFragmentManager(), "DeleteEventDialog");
+    }
+
+    // The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the NoticeDialogFragment.NoticeDialogListener interface
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+        DocumentReference deleteRef = mFStore.collection("Teams/"+this.getIntent().getExtras().getString("team_id")+"/Events").document(this.getIntent().getExtras().getString("event_id"));
+        deleteRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(EventViewActivity.this, "Your event was successfully deleted", Toast.LENGTH_LONG).show();
+                    Intent mainIntent = new Intent(EventViewActivity.this, MainActivity.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else{
+                    Toast.makeText(EventViewActivity.this, "Your event could not be deleted successfully. Please try again later", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
             case R.id.admin_edit_event:
                 Intent editIntent = new Intent(EventViewActivity.this, EditEventActivity.class);
+                editIntent.putExtra("event_id", this.getIntent().getExtras().getString("event_id"));
+                editIntent.putExtra("team_id", this.getIntent().getExtras().getString("team_id"));
+                Log.d(TAG, "I put "+this.getIntent().getExtras().getString("event_id")+" and "+this.getIntent().getExtras().getString("team_id")+" into the intent");
                 startActivity(editIntent);
                 return true;
 
             case R.id.admin_delete_event:
-
+                item.setEnabled(false);
+                showNoticeDialog();
                 return true;
 
             default:
@@ -484,11 +530,15 @@ public class EventViewActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             rsvp_spinner.setSelection(3);
-
                         }
                     });
                 } else {
-                    rsvp_spinner.setSelection(0);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rsvp_spinner.setSelection(0);
+                        }
+                    });
                     Log.d(TAG, "set to undecided");
                 }
                 return null;

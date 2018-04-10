@@ -44,10 +44,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView5"
-                app:layout_constraintTop_toBottomOf="@+id/editText7" />
+                app:layout_constraintTop_toBottomOf="@+id/edit_event_description_text" />
 
             <TextView
-                android:id="@+id/editText7"
+                android:id="@+id/edit_event_description_text"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginTop="8dp"
@@ -87,10 +87,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
-                app:layout_constraintTop_toBottomOf="@+id/editText6" />
+                app:layout_constraintTop_toBottomOf="@+id/edit_event_location" />
 
             <TextView
-                android:id="@+id/editText6"
+                android:id="@+id/edit_event_location"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginTop="8dp"
@@ -124,7 +124,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/editText5"
+                android:id="@+id/edit_event_time"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
 
@@ -137,7 +137,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/editText4"
+                android:id="@+id/event_date_text"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginTop="8dp"
@@ -169,7 +169,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/event_date"
-                app:layout_constraintTop_toBottomOf="@+id/editText5" />
+                app:layout_constraintTop_toBottomOf="@+id/edit_event_time" />
 
             <EditText
                 android:id="@+id/event_date"
@@ -184,7 +184,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
-                app:layout_constraintTop_toBottomOf="@+id/editText4" />
+                app:layout_constraintTop_toBottomOf="@+id/event_date_text" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
@@ -212,7 +212,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/editText"
+                android:id="@+id/edit_event_title"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginTop="16dp"
@@ -246,7 +246,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView"
-                app:layout_constraintTop_toBottomOf="@+id/editText" />
+                app:layout_constraintTop_toBottomOf="@+id/edit_event_title" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>

@@ -111,7 +111,7 @@ public class FragmentHome extends Fragment {
         user_id = mAuth.getCurrentUser().getUid();
     }
 
-    private void getUpcoming(String team_id){
+    private void getUpcoming(final String team_id){
         Query upQuery = mFStore.collection("Teams/"+team_id+"/Events")
                 .whereGreaterThan("date", currentDate)
                 .orderBy("date", Query.Direction.ASCENDING)
@@ -135,7 +135,7 @@ public class FragmentHome extends Fragment {
                         Intent i = new Intent(getActivity(), EventViewActivity.class);
                         String eventID = model.getEventID();
                         i.putExtra("event_id", eventID);
-                        Log.d(TAG, "I put "+eventID+" into the intent");
+                        i.putExtra("team_id", team_id);
                         startActivity(i);
                     }
                 });
@@ -162,7 +162,7 @@ public class FragmentHome extends Fragment {
         upAdapter.startListening();
     }
 
-    private void getPast(String team_id){
+    private void getPast(final String team_id){
         Query pastQuery = mFStore.collection("Teams/"+team_id+"/Events")
                 .whereLessThan("date", currentDate)
                 .orderBy("date", Query.Direction.DESCENDING)
@@ -180,6 +180,16 @@ public class FragmentHome extends Fragment {
                 holder.monthText.setText(model.getMonth());
                 holder.timeText.setText(model.getTime());
                 holder.locationText.setText(model.getLocation());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getActivity(), EventViewActivity.class);
+                        String eventID = model.getEventID();
+                        i.putExtra("event_id", eventID);
+                        i.putExtra("team_id", team_id);
+                        startActivity(i);
+                    }
+                });
             }
 
 

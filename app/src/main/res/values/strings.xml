@@ -94,6 +94,12 @@
     <string name="save_btn_txt">SAVE</string>
     <string name="rsvp">Your RSVP:</string>
     <string name="empty_list_view_message">This list is empty.</string>
+    <string name="save_btn_edit_txt">UPDATE</string>
+    <string name="deleteevent">Are you sure you want to delete this event?</string>
+    <string name="deleteeventitle">Delete Event</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="nav_sign_out">Sign Out</string>
     <string-array name="rsvp_array">
         <item>Undecided</item>
         <item>Going</item>
