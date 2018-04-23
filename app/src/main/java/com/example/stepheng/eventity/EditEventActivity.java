@@ -23,9 +23,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,8 +52,8 @@ public class EditEventActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFStore;
 
-    private final String TAG = "NewEventActivity";
-    private String time;
+    private final String TAG = "EditEventActivity";
+    private String date;
     private String event_id, team_id, user_id;
 
     @Override
@@ -150,7 +152,7 @@ public class EditEventActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         String saveFormat = "yyyy-M-d";
         SimpleDateFormat nsdf = new SimpleDateFormat(saveFormat);
-        setTime(nsdf.format((calendar.getTime())));
+        setDate(nsdf.format((calendar.getTime())));
         eventDate.setText(sdf.format(calendar.getTime()));
     }
 
@@ -160,9 +162,9 @@ public class EditEventActivity extends AppCompatActivity {
         finish();
     }
 
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-M-d'T'HH:mm'Z'");
-    public Date getDateFromString(String datetoSaved){
 
+    public Date getDateFromString(String datetoSaved){
+        SimpleDateFormat format = new SimpleDateFormat("EEEE, MMMM dd yyyy HH:mm", Locale.ENGLISH);
         try {
             Date date = format.parse(datetoSaved);
             return date ;
@@ -194,7 +196,10 @@ public class EditEventActivity extends AppCompatActivity {
                 final String event_location = eventLocation.getText().toString();
                 final String event_date = eventDate.getText().toString();
                 final String event_time = eventTime.getText().toString();
-                final Date event_time_and_date = getDateFromString(time+"T"+event_time+"Z");
+                String combined_datentime = event_date+" "+event_time;
+                Log.d(TAG, "the combined time = "+ combined_datentime);
+                final Date event_time_and_date = getDateFromString(combined_datentime);
+                Log.d(TAG, event_time_and_date.toString());
                 //store event in Firestore
                 DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
                 teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -207,7 +212,8 @@ public class EditEventActivity extends AppCompatActivity {
                                 DocumentReference newEvent = mFStore.collection("Teams/"+team_id+"/Events").document(event_id);
                                 Log.d(TAG, "The event path given was "+"Teams/"+team_id+"/Events/"+event_id);
                                 final String event_id = newEvent.getId();
-                                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time, event_id));
+                                Event updatedEvent = new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time, event_id);
+                                newEvent.set(updatedEvent);
 
                                 //add a success toast and send to Main Activity
                                 Toast.makeText(EditEventActivity.this, "Event updated", Toast.LENGTH_LONG).show();
@@ -228,8 +234,8 @@ public class EditEventActivity extends AppCompatActivity {
         }
     }
 
-    public void setTime(String time){
-        this.time = time;
+    public void setDate(String time){
+        this.date = time;
     }
     public void setTeamID(String teamid){
         this.team_id = teamid;

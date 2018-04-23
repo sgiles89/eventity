@@ -131,24 +131,25 @@ public class FragmentTeamWait extends Fragment {
                 holder.reject.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mFStore.collection("Teams/"+team_id+"/Waitlist").document(model.getUserID())
-                                .delete()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w(TAG, "Error deleting document", e);
-                                    }
-                                });
-                        Toast.makeText(getContext(), model.getName()+" was rejected", Toast.LENGTH_LONG).show();
+                        WriteBatch batch = mFStore.batch();
+                        DocumentReference waitlistRef = mFStore.collection("Teams/" + team_id + "/Waitlist").document(model.getUserID());
+                        DocumentReference userProfileRef = mFStore.collection("Users/" + model.getUserID() + "/Membership").document("Membership");
+                        batch.delete(waitlistRef);
+                        batch.delete(userProfileRef);
+                        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(), model.getName() + " removed from the waitlist", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getContext(), "failure" + task.getException(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
                     }
                 });
             }
+
 
 
 
@@ -199,6 +200,8 @@ public class FragmentTeamWait extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (adapter !=null){
+            adapter.stopListening();
+        }
     }
 }

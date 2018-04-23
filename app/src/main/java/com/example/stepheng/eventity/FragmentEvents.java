@@ -183,7 +183,9 @@ public class FragmentEvents extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (adapter != null){
+            adapter.stopListening();
+        }
     }
 
     @Override public void onDestroyView() {

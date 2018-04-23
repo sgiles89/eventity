@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             user_id = mAuth.getInstance().getCurrentUser().getUid();
         }
+        initFCM();
 
         mainFragment = new MainFragment();
         adminFragment = new AdminFragment();
@@ -267,6 +269,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void sendRegistrationToServer(String token) {
+        Log.d(TAG, "sendRegistrationToServer: sending token to server: " + token);
+        DocumentReference regToken = mFStore.collection("Users").document(user_id);
+        regToken.update("messaging_token", token);
+    }
+
+
+    private void initFCM(){
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.d(TAG, "initFCM: token: " + token);
+        sendRegistrationToServer(token);
+
     }
 
     private void hideItem()

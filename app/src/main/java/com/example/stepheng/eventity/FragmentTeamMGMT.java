@@ -101,6 +101,8 @@ public class FragmentTeamMGMT extends Fragment {
                 if (model.getUserID().equals(user_id) || model.getRole().equals("owner")) {
                     holder.adjust.setEnabled(false);
                     holder.remove.setEnabled(false);
+                    //holder.adjust.setBackgroundColor(getResources().getColor(R.color.greyedout));
+                    //holder.remove.setBackgroundColor(getResources().getColor(R.color.greyedout));
                 }
                 //set the adjust text to "make admin" for users and "demote" for admins
                 if (model.getRole().equals("member")){
@@ -177,8 +179,10 @@ public class FragmentTeamMGMT extends Fragment {
                 } else {
                     if (option.equals("admin")){
                         Toast.makeText(getContext(), name+" could not been promoted to Admin at this time. Please try again later", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "Error: "+task.getException());
                     } else {
                         Toast.makeText(getContext(), name+" could not been demoted to Member at this time. Please try again later", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "Error: "+task.getException());
                     }
                 }
             }
@@ -200,6 +204,7 @@ public class FragmentTeamMGMT extends Fragment {
                 if (task.isSuccessful()){
                     Toast.makeText(getContext(), name+" has been removed from the team", Toast.LENGTH_LONG).show();
                 } else {
+                    Exception e = task.getException();
                     Toast.makeText(getContext(), name+" could not be removed at this time. Please try again later", Toast.LENGTH_LONG).show();
                 }
             }
@@ -229,6 +234,9 @@ public class FragmentTeamMGMT extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (adapter !=null){
+            adapter.stopListening();
+        }
+
     }
 }

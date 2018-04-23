@@ -35,7 +35,6 @@ import butterknife.Unbinder;
 
 public class FragmentHome extends Fragment {
 
-    private String team_id;
     private String TAG = "FragmentHome";
     private String user_id;
     private Date currentDate = Calendar.getInstance().getTime();
@@ -243,9 +242,12 @@ public class FragmentHome extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        upAdapter.stopListening();
-        pastAdapter.stopListening();
+        if (upAdapter != null && pastAdapter != null){
+            pastAdapter.stopListening();
+            upAdapter.stopListening();
+        }
     }
+
     /*
     @Override
     public void onResume(){

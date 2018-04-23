@@ -346,7 +346,7 @@ public class EventViewActivity extends AppCompatActivity implements DeleteEventD
 
                                         @Override
                                         public void onError(FirebaseFirestoreException e) {
-                                            Log.e("error", e.getMessage());
+                                            Log.e("errorEventView", e.getMessage());
                                         }
                                     };
 
@@ -593,6 +593,9 @@ public class EventViewActivity extends AppCompatActivity implements DeleteEventD
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (adapter != null){
+            adapter.stopListening();
+        }
+
     }
 }

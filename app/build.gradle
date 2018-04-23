@@ -24,24 +24,54 @@ ext {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // App Compat
     implementation 'com.android.support:appcompat-v7:27.1.0'
+
+    //Support Library
     implementation 'com.android.support:support-v4:27.1.0'
+
+    //Design Library
     compile "com.android.support:design:${supportLibVersion}"
+
+    //Constraint Layout
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    //Firebase Auth, Storage, Cloud Firestore and Cloud Messaging
     implementation 'com.google.firebase:firebase-auth:11.8.0'
     implementation 'com.google.firebase:firebase-storage:11.8.0'
     implementation 'com.firebaseui:firebase-ui-firestore:3.2.2'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+
     compile 'com.google.firebase:firebase-firestore:11.8.0'
+
+    //Circle Image View
     compile 'de.hdodenhof:circleimageview:2.2.0'
+
+    //Image Cropper
     compile 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
+
+    //ButterKnife
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    //Glide
     implementation 'com.github.bumptech.glide:glide:4.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+
+    //Junit
     testImplementation 'junit:junit:4.12'
+
+    //Runner
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
+
+    //Espresso
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    //Recycler View
     implementation 'com.android.support:recyclerview-v7:27.1.0'
+
+    //Card View
     implementation 'com.android.support:cardview-v7:27.1.0'
 }
 apply plugin: 'com.google.gms.google-services'
