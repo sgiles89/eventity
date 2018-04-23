@@ -1,6 +1,7 @@
 package com.example.stepheng.eventity;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -54,6 +55,8 @@ public class FragmentHome extends Fragment {
     LinearLayoutManager upcomingLLM;
     LinearLayoutManager pastLLM;
     private Unbinder unbinder;
+
+
 
     public FragmentHome() {
         // Required empty public constructor

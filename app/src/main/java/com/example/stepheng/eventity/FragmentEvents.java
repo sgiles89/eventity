@@ -41,14 +41,15 @@ public class FragmentEvents extends Fragment {
     private String user_id;
     private Date currentDate = Calendar.getInstance().getTime();
 
-    @BindView(R.id.event_view)
-    RecyclerView eventView;
+
 
     //declare Firebase variables
     private FirebaseFirestore mFStore;
     private FirebaseAuth mAuth;
 
     //declare RecyclerView and Butterknife variables
+    @BindView(R.id.event_view)
+    RecyclerView eventView;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
     private Unbinder unbinder;

@@ -4,51 +4,110 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().Firebase);
 var db = admin.firestore();
 exports.newMemberNotification = functions.firestore
-    .document('Teams/{teamId}/Members/{userId}').onCreate((snap, context) => {
+    .document('Teams/{teamId}/Waitlist/{userId}').onDelete((snap, context) => {
       // get the user we want to send the message to
       const newValue = snap.data();
+      const teamidno = context.params.teamId;
       const useridno = newValue.userID;
+
+      //start retrieving Waitlist user's messaging token to send them a message
       var tokenRef = db.collection('Users').doc(useridno);
-      tokenRef.get()
+      return tokenRef.get()
+      .then(doc => {
+        if (!doc.exists) {
+          console.log('No such document!');
+        } else {
+          const data = doc.data();
+          //get the messaging token
+          var token = data.messaging_token;
+          console.log("token: ", token);
+          //reference for the members collection
+          var memberRef = db.collection('Teams/'+teamidno+'/Members').doc(useridno);
+          return memberRef.get()
+          .then(doc => {
+            if (!doc.exists){
+              console.log('user was not added to team. Informing them');
+              const negPayload = {
+                data: {
+                  data_type:"team_rejection",
+                  title:"Request denied",
+                  message: "Your request to join the team has been denied",
+                }
+              };
+              return admin.messaging().sendToDevice(token, negPayload)
+              .then(function(response){
+                console.log("Successfully sent rejection message:", response);
+                return Promise(response);
+              })
+              .catch(function(error){
+                console.log("Error sending rejection message: ", error);
+              });
+            } else {
+              console.log('user was added to the team. Informing them')
+              const payload = {
+                data: {
+                  data_type: "team_accept",
+                  title: "Request approved",
+                  message: "You have been added to the team",
+                }
+              };
+              return admin.messaging().sendToDevice(token, payload)
+              .then(function(response){
+                console.log("Successfully sent accept message:", response);
+                return;
+              })
+              .catch(function(error){
+                console.log("Error sending accept message: ", error);
+              });
+            }
+          })
+          .catch(err => {
+            console.log('Error getting member', err);
+          });
+        }
+        return Promise(doc.getData());
+        })
+        .catch(err => {
+          console.log('Error getting token', err);
+        });
+    });
+exports.removedFromTeam = functions.firestore.document('Teams/{teamId}/Members/{userId}').onDelete((snap, context) => {
+    // get the user we want to send the message to
+    const newValue = snap.data();
+    const teamidno = context.params.teamId;
+    const useridno = newValue.userID;
+
+    //start retrieving Waitlist user's messaging token to send them a message
+    var tokenRef = db.collection('Users').doc(useridno);
+    return tokenRef.get()
     .then(doc => {
       if (!doc.exists) {
         console.log('No such document!');
       } else {
         const data = doc.data();
+        //get the messaging token
         var token = data.messaging_token;
         console.log("token: ", token);
         const payload = {
           data: {
-              data_type: "direct_message",
-              title: "Request approved",
-              message: "You have been added to the team",
+            data_type: "team_remove",
+            title: "Membership Revoked",
+            message: "You have been removed from the team",
           }
-        }
-        console.log("the payload was", payload);
+        };
         return admin.messaging().sendToDevice(token, payload)
-          .then(function(response){
-            console.log("Successfully sent message:", response);
-            return db.collection('Users/'+useridno+"/Notifications").add({
-              title: 'Request approved',
-              message: 'Your request to join the team has been approved'
-            }).then(ref => {
-              console.log('Added document with ID: ', ref.id);
-              return ref
-            });
-          })
-          .catch(function(error){
-            console.log("Error sending message: ", error);
-          });
+        .then(function(response){
+          console.log("Successfully sent accept message:", response);
+          return;
+        })
+        .catch(function(error){
+          console.log("Error sending accept message: ", error);
+        });
       }
-      return 5;
+      return Promise(doc.getData());
     })
     .catch(err => {
-      console.log('Error getting document', err);
-    });
-});
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+        console.log('Error getting token', err);
+      });
+
+  });
