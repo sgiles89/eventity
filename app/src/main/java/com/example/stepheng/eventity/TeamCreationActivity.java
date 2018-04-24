@@ -102,7 +102,7 @@ public class TeamCreationActivity extends AppCompatActivity {
         });
     }
 
-    private void createTeam(String teamName, String access_code, final String user_id) {
+    private void createTeam(final String teamName, String access_code, final String user_id) {
         //create the Team document
         DocumentReference newTeam = mFStore.collection("Teams").document();
         final String teamID = newTeam.getId();
@@ -133,6 +133,7 @@ public class TeamCreationActivity extends AppCompatActivity {
                             userData.put("role", "owner");
                             userData.put("userID", user_id);
                             userData.put("teamID", teamID);
+                            userData.put("teamName",teamName);
                             batch.set(userProfile,userData);
                             batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

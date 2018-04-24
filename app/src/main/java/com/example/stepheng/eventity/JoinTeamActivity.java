@@ -118,6 +118,7 @@ public class JoinTeamActivity extends AppCompatActivity {
                             membershipData.put("teamID", teamId);
                             membershipData.put("role", "pending");
                             membershipData.put("name", display_name);
+                            membershipData.put("teamName",team_name);
                             updateMemberships.set(membershipData);
 
                             //show success message and send to Main Activity

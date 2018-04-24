@@ -39,19 +39,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }catch (NullPointerException e){
             Log.e(TAG, "onMessageReceived: NullPointerException: " + e.getMessage() );
         }
-        Log.d(TAG, "onMessageReceived: data: " + notificationData);
-        Log.d(TAG, "onMessageReceived: notification body: " + notificationBody);
-        Log.d(TAG, "onMessageReceived: notification title: " + notificationTitle);
-
         Log.d(TAG, "onMessageReceived: new incoming message.");
         String title = remoteMessage.getData().get("title");
         String message = remoteMessage.getData().get("message");
         Log.d(TAG, "title is: "+title);
         Log.d(TAG, "message is: "+message);
+
         Intent intent = new Intent(this, DatabaseService.class);
+
+        // add data to intent
         intent.putExtra("message_type", remoteMessage.getData().get("data_type"));
         intent.putExtra("title", title);
-        // add data to intent
+
         // start the service
         startService(intent);
         sendNotification(message, title);
@@ -67,7 +66,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                        .setSmallIcon(R.drawable.ic_notification)
                         .setContentTitle(messageTitle)
                         .setContentText(messageBody)
                         .setAutoCancel(true)

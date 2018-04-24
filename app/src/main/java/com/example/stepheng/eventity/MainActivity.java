@@ -248,6 +248,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+
+
     private void checkTeamStatus() {
         DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
         teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){

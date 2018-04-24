@@ -19,7 +19,7 @@
     <string name="create_team_btn_txt">Create Team</string>
     <string name="team_code_hint_text">Team Access Code</string>
     <string name="join_team_text">Enter your team name and access code below.</string>
-    <string name="join_team_text2">Team name and Access code must be correct. If you are unsure, please contact your Team Admin</string>
+    <string name="join_team_text2">Team name and Access code are case sensitive. If you have any trouble, please contact your a Team Admin.</string>
     <string name="join_team_btn_txt">Send Team Request</string>
     <string name="action_admin_text">Admin Panel</string>
     <string name="action_join_team_txt">Join Team</string>
@@ -82,7 +82,7 @@
     <string name="team_mgmt_text">Manage Members</string>
     <string name="team_waitlist_text">Waitlist</string>
     <string name="questions_tab_text">Questions</string>
-    <string name="empty_waitlist_text">There are currently not members waiting to access the team. Once a user requests to join the team their name will appear here.</string>
+    <string name="empty_waitlist_text">There is currently nobody waiting to access your team. Once a user requests access, their name will appear here.</string>
     <string name="empty_memberlist_txt">Your team is currently empty. Spread the word!</string>
     <string name="unanswered_questions_text">Unanswered Questions</string>
     <string name="empty_admin_questions_txt">Well done! There are currently no open questions from your team!</string>

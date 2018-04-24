@@ -100,7 +100,9 @@ public class FragmentNotifications extends Fragment {
     }
 
     private void getNotifications(){
-        Query query = mFStore.collection("Users/"+user_id+"/Notifications");
+        Query query = mFStore.collection("Users/"+user_id+"/Notifications")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(9);
 
         FirestoreRecyclerOptions<Notification> response = new FirestoreRecyclerOptions.Builder<Notification>()
                 .setQuery(query, Notification.class)
@@ -112,10 +114,18 @@ public class FragmentNotifications extends Fragment {
 
                 //get long form of createdAt timestamp to calculate timesince
                 Date d = model.getCreatedAt();
-                long time = d.getTime();
+                String timeAgo = "just now";
+                if (d==null){
+                    timeAgo = "just now";
+                } else {
+                    long time = d.getTime();
+                    timeAgo = getTimeAgo(time);
+                }
+
+
 
                 //colouring the time as grey and italics using Spannable string to isolate out the date and colour it with a style from R.style
-                String timesince = model.getMessage()+" "+getTimeAgo(time);
+                String timesince = model.getMessage()+" "+timeAgo;
                 String message = model.getMessage();
                 int start = message.length();
                 int end = timesince.length();

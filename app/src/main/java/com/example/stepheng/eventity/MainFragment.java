@@ -67,6 +67,8 @@ public class MainFragment extends Fragment {
         noTeamFragment = new FragmentNoTeam();
         pendingTeamFragment = new FragmentPendingTeam();
 
+        initFragment();
+
         nFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,19 +90,18 @@ public class MainFragment extends Fragment {
         mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 switch (item.getItemId()){
 
                     case R.id.bottom_action_home :
-                        switchFragment(homeFragment);
+                        replaceFragment(homeFragment);
                         return true;
 
                     case R.id.bottom_action_events :
-                        switchFragment(eventsFragment);
+                        replaceFragment(eventsFragment);
                         return true;
 
                     case R.id.bottom_action_notifications :
-                        switchFragment(notificationsFragment);
+                        replaceFragment(notificationsFragment);
                         return true;
 
                     default:
@@ -125,17 +126,17 @@ public class MainFragment extends Fragment {
                         Log.d(TAG, "document exists");
                         if (document.getString("role").equals("pending")){
                             nFAB.setVisibility(View.INVISIBLE);
-                            switchFragment(pendingTeamFragment);
+                            replaceFragment(pendingTeamFragment);
                         } else if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
-                            switchFragment(homeFragment);
+                            replaceFragment(homeFragment);
                         } else if(document.getString("role").equals("member")){
                             nFAB.setVisibility(View.INVISIBLE);
-                            switchFragment(homeFragment);
+                            replaceFragment(homeFragment);
                         }
                     } else {
                         Log.d(TAG, "document don't exist");
                         nFAB.setVisibility(View.INVISIBLE);
-                        switchFragment(noTeamFragment);
+                        replaceFragment(noTeamFragment);
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
@@ -144,10 +145,49 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private void switchFragment(Fragment fragment){
+    private void initFragment(){
+
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.main_container, fragment);
+
+        fragmentTransaction.add(R.id.main_container, homeFragment);
+        fragmentTransaction.add(R.id.main_container, notificationsFragment);
+        fragmentTransaction.add(R.id.main_container, eventsFragment);
+
+        fragmentTransaction.hide(notificationsFragment);
+        fragmentTransaction.hide(eventsFragment);
+
         fragmentTransaction.commit();
+
+    }
+
+    private void replaceFragment(Fragment fragment){
+
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+        if(fragment == homeFragment){
+
+            fragmentTransaction.hide(eventsFragment);
+            fragmentTransaction.hide(notificationsFragment);
+
+        }
+
+        if(fragment == eventsFragment){
+
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(notificationsFragment);
+
+        }
+
+        if(fragment == notificationsFragment){
+
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(eventsFragment);
+
+        }
+        fragmentTransaction.show(fragment);
+
+        //fragmentTransaction.replace(R.id.main_container, fragment);
+        fragmentTransaction.commit();
+
     }
 
 }
