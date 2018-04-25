@@ -148,7 +148,7 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     private void updateLabel() {
-        String myFormat = "EEEE, MMMM dd YYYY"; //
+        String myFormat = "EEEE, MMMM dd yyyy"; //
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         String saveFormat = "yyyy-M-d";
         SimpleDateFormat nsdf = new SimpleDateFormat(saveFormat);

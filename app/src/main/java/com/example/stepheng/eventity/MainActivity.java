@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
         //check for logged in user
         mAuth = FirebaseAuth.getInstance();
         mFStore = FirebaseFirestore.getInstance();
@@ -63,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             user_id = mAuth.getInstance().getCurrentUser().getUid();
+
         }
+        Log.d(TAG, "the user is = "+user_id);
         initFCM();
 
         mainFragment = new MainFragment();
@@ -275,15 +276,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendRegistrationToServer(String token) {
         Log.d(TAG, "sendRegistrationToServer: sending token to server: " + token);
-        DocumentReference regToken = mFStore.collection("Users").document(user_id);
-        regToken.update("messaging_token", token);
+        if (user_id == null){
+            sendToLogin();
+        } else {
+            DocumentReference regToken = mFStore.collection("Users").document(user_id);
+            regToken.update("messaging_token", token);
+        }
     }
 
 
     private void initFCM(){
         String token = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "initFCM: token: " + token);
+        if(token!=null){ Log.d(TAG, "initFCM: token: " + token);
         sendRegistrationToServer(token);
+        }
+
 
     }
 
