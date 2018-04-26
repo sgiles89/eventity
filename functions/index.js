@@ -111,3 +111,44 @@ exports.removedFromTeam = functions.firestore.document('Teams/{teamId}/Members/{
       });
 
   });
+
+  exports.answeredQuestion = functions.firestore.document('Teams/{teamId}/Questions/{questionID}').onUpdate((change, context) => {
+      // Get an object representing the document
+      const newValue = change.after.data();
+      // access the needed information: the asker's id, the answers name
+      const answerer = newValue.answerer;
+      const askerID = newValue.askerID;
+
+      //retrieve their token
+      var tokenRef = db.collection('Users').doc(askerID);
+      return tokenRef.get()
+      .then(doc => {
+        if (!doc.exists) {
+          console.log('No such document!');
+        } else {
+          const data = doc.data();
+          //get the messaging token
+          var token = data.messaging_token;
+          console.log("token: ", token);
+          const payload = {
+            data: {
+              data_type: "question_answered",
+              title: "Question answered",
+              message: "Your question has been answered by "+askerID,
+            }
+          };
+          return admin.messaging().sendToDevice(token, payload)
+          .then(function(response){
+            console.log("Successfully sent answered message:", response);
+            return;
+          })
+          .catch(function(error){
+            console.log("Error sending answered message: ", error);
+          });
+        }
+        return Promise(doc.getData());
+      })
+      .catch(err => {
+          console.log('Error getting token', err);
+        });
+    });

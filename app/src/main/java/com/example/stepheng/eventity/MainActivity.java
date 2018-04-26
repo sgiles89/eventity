@@ -18,6 +18,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.stepheng.eventity.AdminPanel.AdminFragment;
+import com.example.stepheng.eventity.Home.MainFragment;
+import com.example.stepheng.eventity.Setup.JoinTeamActivity;
+import com.example.stepheng.eventity.Setup.LoginActivity;
+import com.example.stepheng.eventity.Setup.ProfileSetupActivity;
+import com.example.stepheng.eventity.Setup.TeamCreationActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;

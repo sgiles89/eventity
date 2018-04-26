@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.stepheng.eventity.ProfileSetupActivity">
+    tools:context="com.example.stepheng.eventity.Setup.ProfileSetupActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/support_toolbar"

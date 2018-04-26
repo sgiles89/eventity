@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.stepheng.eventity.TeamCreationActivity">
+    tools:context="com.example.stepheng.eventity.Setup.TeamCreationActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/team_creation_toolbar"
