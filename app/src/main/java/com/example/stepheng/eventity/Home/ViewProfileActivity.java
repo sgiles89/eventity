@@ -97,14 +97,25 @@ public class ViewProfileActivity extends AppCompatActivity implements LeaveTeamD
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
                     DocumentSnapshot documentSnapshot = task.getResult();
+                    if (documentSnapshot.exists()){
+                        String role;
+                        String teamName = documentSnapshot.getString("teamName");
+                        if (documentSnapshot.getString("role").equals("pending")){
+                            role = "pending member";
+                        } else {
+                            role = documentSnapshot.getString("role");
+                        }
+                        setTeamID(documentSnapshot.getString("teamID"));
+                        String capitalisedrole = role.substring(0, 1).toUpperCase() + role.substring(1);
+                        profileTeam.setText(capitalisedrole+" of "+teamName);
+                    } else {
+                        //user isn't on a team
+                        profileTeam.setVisibility(View.GONE);
+                        leaveBtn.setVisibility(View.GONE);
+                    }
 
-                    String teamName = documentSnapshot.getString("teamName");
-                    String role = documentSnapshot.getString("role");
-                    setTeamID(documentSnapshot.getString("teamID"));
-                    String capitalisedrole = role.substring(0, 1).toUpperCase() + role.substring(1);
-                    profileTeam.setText(capitalisedrole+" of "+teamName);
-                } else {
-                    profileTeam.setVisibility(View.GONE);
+                }  else {
+                    Toast.makeText(ViewProfileActivity.this, "Unable to retrieve document: " + task.getException(), Toast.LENGTH_LONG).show();
                 }
             }
         });

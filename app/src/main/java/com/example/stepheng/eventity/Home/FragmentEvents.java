@@ -108,7 +108,13 @@ public class FragmentEvents extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         eventView.setLayoutManager(linearLayoutManager);
         mAuth = FirebaseAuth.getInstance();
-        user_id = mAuth.getCurrentUser().getUid();
+        if (mAuth.getCurrentUser() == null) {
+            Intent newIntent = new Intent(getContext(), LoginActivity.class);
+            startActivity(newIntent);
+        }
+        else{
+            user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
     }
 
     private void getEvents(String team_id){
@@ -148,6 +154,11 @@ public class FragmentEvents extends Fragment {
                         .inflate(R.layout.eventlist_layout, group, false);
 
                 return new EventHolder(view);
+            }
+            @Override
+            public void onDataChanged() {
+                // If there are no chat messages, show a view that invites the user to add a message.
+                mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             }
 
             @Override

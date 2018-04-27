@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d(TAG, "the user is = "+user_id);
         initFCM();
-
+        checkTeamStatus();
         mainFragment = new MainFragment();
         adminFragment = new AdminFragment();
 
@@ -196,6 +196,42 @@ public class MainActivity extends AppCompatActivity {
         Intent JoinTeamItent = new Intent(MainActivity.this, JoinTeamActivity.class);
         startActivity(JoinTeamItent);
         finish();
+    }
+
+    private void checkTeamStatus() {
+        Log.d(TAG, "checking the team status");
+        //reference to the user's membership document
+        DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        //retrieving the document
+        teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //if there is a document
+                if (task.isSuccessful()) {
+                    //store the document in a document object
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        Log.d(TAG, "document exists");
+                        //if the user's role is pending, set the status and hide the FAB, switch the fragment
+                        if (document.getString("role").equals("pending")){
+                            hideItem();
+                            //if the user's role is owner or admin, set the status and leave the FAB visible
+                        } else if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
+
+                            //if the user's role is a member, set the status and hide the FAB
+                        } else if(document.getString("role").equals("member")){
+                            hideItem();
+                        }
+                    } else {
+                        //the user is not a member of a team and is shown the team fragment, the FAB is also hidden
+                        Log.d(TAG, "User is not a member of a team - noTeamFragment");
+                        hideItem();
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     private void sendtoAdminMain() {

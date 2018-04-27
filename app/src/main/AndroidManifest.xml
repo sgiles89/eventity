@@ -56,10 +56,6 @@
         <activity
             android:name=".Events.EventViewActivity"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".AdminPanel.AdminPanelActivity"
-            android:label="@string/title_activity_admin_panel"
-            android:theme="@style/AppTheme" />
         <activity android:name=".Events.EditEventActivity" />
         <activity
             android:name=".Home.ViewProfileActivity"

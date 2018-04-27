@@ -93,7 +93,13 @@ public class FragmentNotifications extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         notifView.setLayoutManager(linearLayoutManager);
         mAuth = FirebaseAuth.getInstance();
-        user_id = mAuth.getCurrentUser().getUid();
+        if (mAuth.getCurrentUser() == null) {
+            Intent newIntent = new Intent(getContext(), LoginActivity.class);
+            startActivity(newIntent);
+        }
+        else{
+            user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
     }
 
     private void getNotifications(){

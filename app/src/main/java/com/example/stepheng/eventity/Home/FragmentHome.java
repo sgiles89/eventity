@@ -118,7 +118,13 @@ public class FragmentHome extends Fragment {
         upcomingView.setLayoutManager(upcomingLLM);
         pastView.setLayoutManager(pastLLM);
         mAuth = FirebaseAuth.getInstance();
-        user_id = mAuth.getCurrentUser().getUid();
+        if (mAuth.getCurrentUser() == null) {
+            Intent newIntent = new Intent(getContext(), LoginActivity.class);
+            startActivity(newIntent);
+        }
+        else{
+            user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
         pastText.setVisibility(View.INVISIBLE);
         upcomingText.setVisibility(View.INVISIBLE);
         pastView.setVisibility(View.INVISIBLE);
