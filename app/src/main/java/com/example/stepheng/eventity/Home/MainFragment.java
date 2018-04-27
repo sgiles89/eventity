@@ -48,6 +48,7 @@ public class MainFragment extends Fragment {
     private FirebaseFirestore mFStore;
     private String user_id;
     private Unbinder unbinder;
+    private String status;
 
     public MainFragment() {
         // Required empty public constructor
@@ -96,11 +97,24 @@ public class MainFragment extends Fragment {
                 switch (item.getItemId()){
 
                     case R.id.bottom_action_home :
-                        replaceFragment(homeFragment);
+                        if (status=="member"||status=="admin"){
+                            replaceFragment(homeFragment);
+                        } else if(status == "pending"){
+                            replaceFragment(pendingTeamFragment);
+                        } else {
+                            replaceFragment(noTeamFragment);
+                        }
                         return true;
 
                     case R.id.bottom_action_events :
-                        replaceFragment(eventsFragment);
+                        if (status=="member"||status=="admin"){
+                            replaceFragment(eventsFragment);
+                        } else if(status == "pending"){
+                            replaceFragment(pendingTeamFragment);
+                        } else {
+                            replaceFragment(noTeamFragment);
+                        }
+
                         return true;
 
                     case R.id.bottom_action_notifications :
@@ -117,29 +131,44 @@ public class MainFragment extends Fragment {
 
         return view;
     }
-
+    private void setStatus(String status){
+        this.status = status;
+    }
     private void checkTeamStatus() {
+        Log.d(TAG, "checking the team status");
+        //reference to the user's membership document
         DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        //retrieving the document
         teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //if there is a document
                 if (task.isSuccessful()) {
+                    //store the document in a document object
                     DocumentSnapshot document = task.getResult();
                     if (document != null && document.exists()) {
                         Log.d(TAG, "document exists");
+                        //if the user's role is pending, set the status and hide the FAB, switch the fragment
                         if (document.getString("role").equals("pending")){
                             nFAB.setVisibility(View.INVISIBLE);
                             replaceFragment(pendingTeamFragment);
+                            setStatus("pending");
+                            //if the user's role is owner or admin, set the status and leave the FAB visible
                         } else if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
                             replaceFragment(homeFragment);
+                            setStatus("admin");
+                            //if the user's role is a member, set the status and hide the FAB
                         } else if(document.getString("role").equals("member")){
                             nFAB.setVisibility(View.INVISIBLE);
+                            setStatus("member");
                             replaceFragment(homeFragment);
                         }
                     } else {
-                        Log.d(TAG, "document don't exist");
+                        //the user is not a member of a team and is shown the team fragment, the FAB is also hidden
+                        Log.d(TAG, "User is not a member of a team - noTeamFragment");
                         nFAB.setVisibility(View.INVISIBLE);
                         replaceFragment(noTeamFragment);
+                        setStatus("noteam");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
@@ -155,9 +184,13 @@ public class MainFragment extends Fragment {
         fragmentTransaction.add(R.id.main_container, homeFragment);
         fragmentTransaction.add(R.id.main_container, notificationsFragment);
         fragmentTransaction.add(R.id.main_container, eventsFragment);
+        fragmentTransaction.add(R.id.main_container, noTeamFragment);
+        fragmentTransaction.add(R.id.main_container, pendingTeamFragment);
 
         fragmentTransaction.hide(notificationsFragment);
         fragmentTransaction.hide(eventsFragment);
+        fragmentTransaction.hide(noTeamFragment);
+        fragmentTransaction.hide(pendingTeamFragment);
 
         fragmentTransaction.commit();
 
@@ -166,10 +199,13 @@ public class MainFragment extends Fragment {
     private void replaceFragment(Fragment fragment){
 
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+
         if(fragment == homeFragment){
 
             fragmentTransaction.hide(eventsFragment);
             fragmentTransaction.hide(notificationsFragment);
+            fragmentTransaction.hide(noTeamFragment);
+            fragmentTransaction.hide(pendingTeamFragment);
 
         }
 
@@ -177,6 +213,8 @@ public class MainFragment extends Fragment {
 
             fragmentTransaction.hide(homeFragment);
             fragmentTransaction.hide(notificationsFragment);
+            fragmentTransaction.hide(noTeamFragment);
+            fragmentTransaction.hide(pendingTeamFragment);
 
         }
 
@@ -184,7 +222,23 @@ public class MainFragment extends Fragment {
 
             fragmentTransaction.hide(homeFragment);
             fragmentTransaction.hide(eventsFragment);
+            fragmentTransaction.hide(noTeamFragment);
+            fragmentTransaction.hide(pendingTeamFragment);
 
+        }
+
+        if (fragment == noTeamFragment){
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(eventsFragment);
+            fragmentTransaction.hide(pendingTeamFragment);
+            fragmentTransaction.hide(notificationsFragment);
+        }
+
+        if (fragment == pendingTeamFragment){
+            fragmentTransaction.hide(homeFragment);
+            fragmentTransaction.hide(eventsFragment);
+            fragmentTransaction.hide(noTeamFragment);
+            fragmentTransaction.hide(notificationsFragment);
         }
         fragmentTransaction.show(fragment);
 

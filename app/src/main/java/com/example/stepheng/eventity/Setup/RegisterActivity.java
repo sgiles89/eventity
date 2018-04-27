@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.stepheng.eventity.MainActivity;
@@ -19,14 +20,23 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText reg_email_field;
-    private EditText reg_pass_field;
-    private EditText reg_pass_confirm_field;
-    private Button reg_butn;
-    private Button reg_login_btn;
-    private ProgressBar reg_progress;
+    @BindView(R.id.reg_email)
+    EditText reg_email_field;
+    @BindView(R.id.reg_password)
+    EditText reg_pass_field;
+    @BindView(R.id.reg_password_confirm)
+    EditText reg_pass_confirm_field;
+    @BindView(R.id.reg_btn)
+    Button reg_butn;
+    @BindView(R.id.login_text_view)
+    TextView reg_login_btn;
+    @BindView(R.id.reg_progress)
+    ProgressBar reg_progress;
 
     private FirebaseAuth mAuth;
 
@@ -34,15 +44,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
-
-        reg_email_field =  findViewById(R.id.reg_email);
-        reg_pass_field = findViewById(R.id.reg_password);
-        reg_pass_confirm_field = findViewById(R.id.reg_password_confirm);
-        reg_butn = findViewById(R.id.reg_btn);
-        reg_login_btn = findViewById(R.id.reg_to_login_button);
-        reg_progress = findViewById(R.id.reg_progress);
 
         reg_login_btn.setOnClickListener(new View.OnClickListener() {
             @Override

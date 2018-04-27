@@ -44,6 +44,7 @@ public class FragmentNotifications extends Fragment {
     //declare Recyclerview
     @BindView(R.id.notif_view)
     RecyclerView notifView;
+    @BindView(R.id.empty_notif_message) TextView mEmptyListMessage;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
     private Unbinder unbinder;
@@ -159,7 +160,10 @@ public class FragmentNotifications extends Fragment {
 
                 return new NotificationHolder(view);
             }
-
+            public void onDataChanged() {
+                // If there are no chat messages, show a view that invites the user to add a message.
+                mEmptyListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+            }
             @Override
             public void onError(FirebaseFirestoreException e) {
                 Log.e("error", e.getMessage());

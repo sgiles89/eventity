@@ -383,7 +383,7 @@ public class EventViewActivity extends AppCompatActivity implements DeleteEventD
                                                     .setTitle("Ask a question")
                                                     .setMessage("Your question:")
                                                     .setView(question)
-                                                    .setPositiveButton("Answer", new DialogInterface.OnClickListener() {
+                                                    .setPositiveButton("Ask", new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog, int whichButton) {
                                                             String myQuestion = question.getText().toString();
                                                             Calendar cal = Calendar.getInstance();

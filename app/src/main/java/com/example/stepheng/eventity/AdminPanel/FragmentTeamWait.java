@@ -1,5 +1,6 @@
 package com.example.stepheng.eventity.AdminPanel;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.stepheng.eventity.Home.ViewProfileActivity;
 import com.example.stepheng.eventity.R;
 import com.example.stepheng.eventity.Classes.WaitlistMember;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -95,6 +97,15 @@ public class FragmentTeamWait extends Fragment {
             @Override
             public void onBindViewHolder(WaitlistMemberHolder holder, int position, final WaitlistMember model) {
                 holder.textName.setText(model.getName());
+
+                holder.textName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent profileIntent = new Intent(getActivity(), ViewProfileActivity.class);
+                        profileIntent.putExtra("profile_id", model.getUserID());
+                        startActivity(profileIntent);
+                    }
+                });
 
                 holder.accept.setOnClickListener(new View.OnClickListener() {
                     @Override

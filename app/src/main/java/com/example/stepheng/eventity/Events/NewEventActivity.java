@@ -7,6 +7,7 @@ import android.net.ParseException;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -191,31 +192,37 @@ public class NewEventActivity extends AppCompatActivity {
                 final String event_date = eventDate.getText().toString();
                 final String event_time = eventTime.getText().toString();
                 final Date event_time_and_date = getDateFromString(time+"T"+event_time+"Z");
-                Log.d(TAG, "The event time was: "+event_time);
-                //store event in Firestore
-                DocumentReference teamIDRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-                teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document != null && document.exists()){
-                                String teamID = document.getString("teamID");
-                                DocumentReference newEvent = mFStore.collection("Teams/"+team_id+"/Events").document();
-                                final String event_id = newEvent.getId();
-                                newEvent.set(new Event(event_title, event_time_and_date,user_id, event_location,event_description, event_time, event_id));
 
-                                //add a success toast and send to Main Activity
-                                Toast.makeText(NewEventActivity.this, "Event created", Toast.LENGTH_LONG).show();
-                                sendToMain();
+                if(TextUtils.isEmpty(event_title)|| TextUtils.isEmpty(event_description) || TextUtils.isEmpty(event_location) || TextUtils.isEmpty(event_date) || TextUtils.isEmpty(event_time)){
+                    Toast.makeText(NewEventActivity.this, "Please ensure all fields are filled in.", Toast.LENGTH_LONG).show();
+                    item.setEnabled(true);
+                } else {
+                    Log.d(TAG, "The event time was: " + event_time);
+                    //store event in Firestore
+                    DocumentReference teamIDRef = mFStore.collection("Users/" + user_id + "/Membership").document("Membership");
+                    teamIDRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null && document.exists()) {
+                                    String teamID = document.getString("teamID");
+                                    DocumentReference newEvent = mFStore.collection("Teams/" + team_id + "/Events").document();
+                                    final String event_id = newEvent.getId();
+                                    newEvent.set(new Event(event_title, event_time_and_date, user_id, event_location, event_description, event_time, event_id));
+
+                                    //add a success toast and send to Main Activity
+                                    Toast.makeText(NewEventActivity.this, "Event created", Toast.LENGTH_LONG).show();
+                                    sendToMain();
+                                } else {
+                                    Log.d(TAG, "No such document");
+                                }
                             } else {
-                                Log.d(TAG, "No such document");
+                                Log.d(TAG, "get failed with ", task.getException());
                             }
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
                         }
-                    }
-                });
+                    });
+                }
                 return true;
 
 

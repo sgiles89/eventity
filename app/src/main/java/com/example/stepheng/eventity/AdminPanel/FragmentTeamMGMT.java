@@ -1,5 +1,7 @@
 package com.example.stepheng.eventity.AdminPanel;
 
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.stepheng.eventity.Home.ViewProfileActivity;
 import com.example.stepheng.eventity.R;
 import com.example.stepheng.eventity.Classes.WaitlistMember;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -96,8 +99,8 @@ public class FragmentTeamMGMT extends Fragment {
                 if (model.getUserID().equals(user_id) || model.getRole().equals("owner")) {
                     holder.adjust.setEnabled(false);
                     holder.remove.setEnabled(false);
-                    //holder.adjust.setBackgroundColor(getResources().getColor(R.color.greyedout));
-                    //holder.remove.setBackgroundColor(getResources().getColor(R.color.greyedout));
+                    holder.adjust.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.greyedout)));
+                    holder.remove.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.greyedout)));
                 }
                 //set the adjust text to "make admin" for users and "demote" for admins
                 if (model.getRole().equals("member")){
@@ -118,6 +121,17 @@ public class FragmentTeamMGMT extends Fragment {
                     });
                 }
                 holder.textName.setText(model.getName());
+                String capitalisedRole =  model.getRole().substring(0, 1).toUpperCase() + model.getRole().substring(1);
+                holder.role.setText(capitalisedRole);
+
+                holder.textName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent profileIntent = new Intent(getActivity(), ViewProfileActivity.class);
+                        profileIntent.putExtra("profile_id", model.getUserID());
+                        startActivity(profileIntent);
+                    }
+                });
 
                 holder.remove.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -214,6 +228,7 @@ public class FragmentTeamMGMT extends Fragment {
         Button adjust;
         @BindView(R.id.memberlist_remove)
         Button remove;
+        @BindView(R.id.member_list_role)TextView role;
 
         public WaitlistMemberHolder(View itemView) {
             super(itemView);

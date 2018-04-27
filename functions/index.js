@@ -134,7 +134,7 @@ exports.removedFromTeam = functions.firestore.document('Teams/{teamId}/Members/{
             data: {
               data_type: "question_answered",
               title: "Question answered",
-              message: "Your question has been answered by "+askerID,
+              message: "Your question has been answered by "+answerer,
             }
           };
           return admin.messaging().sendToDevice(token, payload)

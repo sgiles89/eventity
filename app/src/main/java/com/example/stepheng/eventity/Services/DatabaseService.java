@@ -35,6 +35,7 @@ public class DatabaseService extends IntentService {
         // fetch data to save from intent
         String messageType = intent.getStringExtra("message_type");
         String title = intent.getStringExtra("title");
+        String notificationMessage = intent.getStringExtra("message");
         String message;
         switch (messageType){
             case "team_rejection":
@@ -45,6 +46,9 @@ public class DatabaseService extends IntentService {
                 break;
             case "team_remove":
                 message = "You have been removed from the team.";
+                break;
+            case "question_answered":
+                message = notificationMessage;
                 break;
             default:
                 message = "failed to get notification message";

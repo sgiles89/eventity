@@ -51,6 +51,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // add data to intent
         intent.putExtra("message_type", remoteMessage.getData().get("data_type"));
         intent.putExtra("title", title);
+        intent.putExtra("message", message);
 
         // start the service
         startService(intent);

@@ -54,6 +54,7 @@ public class FragmentEvents extends Fragment {
     //declare RecyclerView and Butterknife variables
     @BindView(R.id.event_view)
     RecyclerView eventView;
+    @BindView(R.id.empty_events_message) TextView mEmptyListMessage;
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
     private Unbinder unbinder;

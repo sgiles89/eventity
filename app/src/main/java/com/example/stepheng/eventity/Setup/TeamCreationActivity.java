@@ -106,43 +106,45 @@ public class TeamCreationActivity extends AppCompatActivity {
 
     private void createTeam(final String teamName, String access_code, final String user_id) {
         //create the Team document
+        WriteBatch batch = mFStore.batch();
         DocumentReference newTeam = mFStore.collection("Teams").document();
         final String teamID = newTeam.getId();
         //create Team data hashmap
         Map<String, Object> teamData = new HashMap<>();
         teamData.put("name", teamName);
         teamData.put("accessCode", access_code);
-
+        DocumentReference userProfile = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("role", "owner");
+        userData.put("userID", user_id);
+        userData.put("teamID", teamID);
+        userData.put("teamName",teamName);
+        batch.set(newTeam,teamData);
+        batch.set(userProfile,userData);
         //add the team data to the document.
-        newTeam.set(teamData)
+        batch.commit()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
 
                             //continue with creating team
-                            WriteBatch batch = mFStore.batch();
                             DocumentReference newMembers = mFStore.collection("Teams/"+teamID+"/Members").document(user_id);
                             //create Member data hashmap
                             Map<String, Object> memberData = new HashMap<>();
                             memberData.put("name", display_name);
                             memberData.put("userID", user_id);
                             memberData.put("role", "owner");
-                            //add user as the owner
-                            batch.set(newMembers, memberData);
-                            DocumentReference userProfile = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-                            Map<String, Object> userData = new HashMap<>();
-                            userData.put("role", "owner");
-                            userData.put("userID", user_id);
-                            userData.put("teamID", teamID);
-                            userData.put("teamName",teamName);
-                            batch.set(userProfile,userData);
-                            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            newMembers.set(memberData).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    //send the user to login
-                                    Toast.makeText(TeamCreationActivity.this, "Team Created", Toast.LENGTH_LONG).show();
-                                    sendToLogin();
+                                    if (task.isSuccessful()){
+                                        Toast.makeText(TeamCreationActivity.this, "Team Created", Toast.LENGTH_LONG).show();
+                                        sendToLogin();
+                                    } else {
+                                        Toast.makeText(TeamCreationActivity.this, "Team not created: "+task.getException(), Toast.LENGTH_LONG).show();
+                                    }
+
                                 }
                             });
                         } else {

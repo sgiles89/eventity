@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.stepheng.eventity.Classes.Event;
@@ -41,10 +42,16 @@ public class FragmentHome extends Fragment {
     private String user_id;
     private Date currentDate = Calendar.getInstance().getTime();
 
+    @BindView(R.id.progressBar2)ProgressBar progressBar;
+    @BindView(R.id.past_text)TextView pastText;
+    @BindView(R.id.upcoming_text)TextView upcomingText;
+
     @BindView(R.id.upcoming_view)
     RecyclerView upcomingView;
     @BindView(R.id.past_view)
     RecyclerView pastView;
+    @BindView(R.id.empty_upevents_message)TextView mEmptyUpListMessage;
+    @BindView(R.id.empty_pastevents_message)TextView mEmptyPastListMessage;
 
     //declare Firebase variables
     private FirebaseFirestore mFStore;
@@ -112,6 +119,13 @@ public class FragmentHome extends Fragment {
         pastView.setLayoutManager(pastLLM);
         mAuth = FirebaseAuth.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
+        pastText.setVisibility(View.INVISIBLE);
+        upcomingText.setVisibility(View.INVISIBLE);
+        pastView.setVisibility(View.INVISIBLE);
+        upcomingView.setVisibility(View.INVISIBLE);
+        mEmptyPastListMessage.setVisibility(View.INVISIBLE);
+        mEmptyUpListMessage.setVisibility(View.INVISIBLE);
+
     }
 
     private void getUpcoming(final String team_id){
@@ -153,6 +167,14 @@ public class FragmentHome extends Fragment {
 
                 return new EventHolder(view);
             }
+            @Override
+            public void onDataChanged() {
+                // If there are no chat messages, show a view that invites the user to add a message.
+                progressBar.setVisibility(View.INVISIBLE);
+                pastText.setVisibility(View.VISIBLE);
+                upcomingText.setVisibility(View.VISIBLE);
+                mEmptyUpListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+            }
 
             @Override
             public void onError(FirebaseFirestoreException e) {
@@ -178,6 +200,13 @@ public class FragmentHome extends Fragment {
         pastAdapter = new FirestoreRecyclerAdapter<Event, EventHolder>(response) {
             @Override
             public void onBindViewHolder(EventHolder holder, int position, final Event model) {
+                pastText.setVisibility(View.VISIBLE);
+                upcomingText.setVisibility(View.VISIBLE);
+                pastView.setVisibility(View.VISIBLE);
+                upcomingView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+
+
                 holder.eventTitle.setText(model.getTitle());
                 holder.dayText.setText(model.getDay());
                 holder.monthText.setText(model.getMonth());
@@ -203,6 +232,11 @@ public class FragmentHome extends Fragment {
                         .inflate(R.layout.eventlist_layout, group, false);
 
                 return new EventHolder(view);
+            }
+            @Override
+            public void onDataChanged() {
+                // If there are no chat messages, show a view that invites the user to add a message.
+                mEmptyPastListMessage.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             }
 
             @Override

@@ -89,7 +89,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_ep">Edit Profile</string>
     <string name="nav_admin">Admin Panel</string>
-    <string name="navbar_name" >First Name LastName</string>
+    <string name="navbar_name">First Name LastName</string>
     <string name="navbar_role">Member of Team</string>
     <string name="save_btn_txt">SAVE</string>
     <string name="rsvp">Your RSVP:</string>
@@ -106,4 +106,21 @@
         <item>Maybe</item>
         <item>Not Going</item>
     </string-array>
+    <string name="title_activity_view_profile">ViewProfileActivity</string>
+    <string name="loading_text">Loading...</string>
+    <string name="leave_team_text">Leave Team</string>
+    <string name="empty_upevents_text">There are no upcoming events to show. Get planning some!</string>
+    <string name="empty_pastevents_text">There are no past events. Hopefully this will change soon!</string>
+    <string name="empty_notif_message">There are no notifications to display.</string>
+    <string name="text_email">Email</string>
+    <string name="text_password">Password</string>
+    <string name="new_user_text">New user?</string>
+    <string name="sign_up_text">Sign Up</string>
+    <string name="welcome_back_text">Welcome Back,</string>
+    <string name="sign_in_continue">Log in to continue</string>
+    <string name="already_registered_text">Already registered?</string>
+    <string name="text_log_in">Log in</string>
+    <string name="text_confirm_password">Confirm Password</string>
+    <string name="text_welcome">Welcome,</string>
+    <string name="text_register">Register for a new account below</string>
 </resources>

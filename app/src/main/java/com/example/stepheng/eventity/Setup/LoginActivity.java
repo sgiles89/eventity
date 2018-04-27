@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.stepheng.eventity.MainActivity;
@@ -19,28 +20,30 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    private EditText loginEmailText;
-    private EditText loginPassText;
-    private Button  loginBtn;
-    private Button loginRegBtn;
+public class LoginActivity extends AppCompatActivity {
+    @BindView(R.id.login_email)
+    EditText loginEmailText;
+    @BindView(R.id.login_password)
+    EditText loginPassText;
+    @BindView(R.id.login_button)
+    Button  loginBtn;
+    @BindView(R.id.sign_up_btn)
+    TextView loginRegBtn;
+    @BindView(R.id.login_progress)
+    ProgressBar loginProgress;
 
     private FirebaseAuth mAuth;
 
-    private ProgressBar loginProgress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
         mAuth = FirebaseAuth.getInstance();
-
-        loginEmailText = findViewById(R.id.login_email);
-        loginPassText = findViewById(R.id.login_password);
-        loginBtn = findViewById(R.id.login_button);
-        loginRegBtn = findViewById(R.id.login_to_reg_button);
-        loginProgress = findViewById(R.id.login_progress);
 
         loginRegBtn.setOnClickListener(new View.OnClickListener(){
             @Override

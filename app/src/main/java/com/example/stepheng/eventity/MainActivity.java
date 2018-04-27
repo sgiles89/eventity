@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.stepheng.eventity.AdminPanel.AdminFragment;
 import com.example.stepheng.eventity.Home.MainFragment;
+import com.example.stepheng.eventity.Home.ViewProfileActivity;
 import com.example.stepheng.eventity.Setup.JoinTeamActivity;
 import com.example.stepheng.eventity.Setup.LoginActivity;
 import com.example.stepheng.eventity.Setup.ProfileSetupActivity;
@@ -85,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         NavigationView navigationView = findViewById(R.id.nav_view);
-        checkTeamStatus();
         navHeader = navigationView.getHeaderView(0);
         navProfileImage = navHeader.findViewById(R.id.user_profile_img);
         navName = navHeader.findViewById(R.id.navbar_name);
@@ -107,18 +107,18 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.nav_admin:
                                 switchFragment(adminFragment);
                                 break;
+                            case R.id.nav_signout:
+                                logOut();
+                                break;
+                            case R.id.nav_gallery:
+                                sendToProfile();
+                                break;
                         }
 
 
                         return true;
                     }
                 });
-
-
-
-
-
-
 
         final DocumentReference profileRef = mFStore.document("Users/"+user_id);
         final DocumentReference membershipRef = mFStore.document("Users/"+user_id+"/Membership/Membership");
@@ -168,37 +168,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-
-            getMenuInflater().inflate(R.menu.main, menu);
-
-            return true;
-        }
-
-        @Override
         public boolean onOptionsItemSelected(MenuItem item) {
 
             switch (item.getItemId()){
-
-                case R.id.action_logout_btn:
-                    logOut();
-                    return true;
-
-                case R.id.action_profile_button:
-                    sendToProfile();
-                    return true;
-
-                case R.id.action_admin_panel:
-                    sendtoAdminMain();
-                    return true;
-
-                case R.id.action_join_team:
-                    sentToJoinTeam();
-                    return true;
-
-                case R.id.action_create_team:
-                    sendtoCreateTeam();
-                    return true;
 
                 case android.R.id.home:
                     mDrawerLayout.openDrawer(GravityCompat.START);
@@ -231,9 +203,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendToProfile() {
-        Intent profileIntent = new Intent(MainActivity.this, ProfileSetupActivity.class);
+        Intent profileIntent = new Intent(MainActivity.this, ViewProfileActivity.class);
+        profileIntent.putExtra("profile_id", user_id);
         startActivity(profileIntent);
-        finish();
     }
 
     private void logOut() {
@@ -255,30 +227,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-
-
-    private void checkTeamStatus() {
-        DocumentReference teamRef = mFStore.collection("Users/"+user_id+"/Membership").document("Membership");
-        teamRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        Log.d(TAG, "document exists");
-                        if(document.getString("role").equals("owner") || document.getString("role").equals("admin")) {
-                        } else {
-                            hideItem();
-                        }
-                    } else {
-                        hideItem();
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
 
     private void sendRegistrationToServer(String token) {
         Log.d(TAG, "sendRegistrationToServer: sending token to server: " + token);

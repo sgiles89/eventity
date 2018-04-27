@@ -13,20 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".Services.MyFirebaseMessagingService">
+        <service android:name=".Services.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".Services.DatabaseService"
-            android:exported="false"/>
-        <service
-            android:name=".Services.MyFirebaseInstanceIdService">
+            android:exported="false" />
+        <service android:name=".Services.MyFirebaseInstanceIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
@@ -35,6 +32,7 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,19 +44,27 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" /> <!-- optional (needed if default theme has no action bar) -->
-        <activity android:name=".Setup.TeamCreationActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".Setup.JoinTeamActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".Events.NewEventActivity"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".Events.EventViewActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".Setup.TeamCreationActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".Setup.JoinTeamActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".Events.NewEventActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".Events.EventViewActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".AdminPanel.AdminPanelActivity"
             android:label="@string/title_activity_admin_panel"
             android:theme="@style/AppTheme" />
         <activity android:name=".Events.EditEventActivity" />
+        <activity
+            android:name=".Home.ViewProfileActivity"
+            android:parentActivityName=".MainActivity">
+        </activity>
     </application>
 
 </manifest>
